@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面白い雑学クイズ100問</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            width: 95%;
+        }
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        .options.answered label {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .options.answered label:hover {
+            background-color: transparent;
+        }
+        .options.answered label.correct {
+            background-color: #d1fae5; /* Tailwind green-100 */
+            border-color: #10b981; /* Tailwind green-500 */
+            color: #059669; /* Tailwind green-600 */
+            font-weight: bold;
+            opacity: 1;
+        }
+        .options.answered label.incorrect {
+            background-color: #fee2e2; /* Tailwind red-100 */
+            border-color: #ef4444; /* Tailwind red-500 */
+            color: #dc2626; /* Tailwind red-600 */
+            font-weight: bold;
+            opacity: 1;
+        }
+        .feedback {
+            display: none;
+        }
+        .feedback.correct {
+            background-color: #d1fae5;
+            border-left: 5px solid #10b981;
+            display: block;
+        }
+        .feedback.incorrect {
+            background-color: #fee2e2;
+            border-left: 5px solid #ef4444;
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
+
+    <div class="container bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+        <!-- ===== スタート画面 ===== -->
+        <div id="start-screen" class="screen active">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-4">面白い雑学クイズ</h1>
+            <p class="text-center text-gray-600 mb-8">挑戦する問題数を選択してください。</p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <button class="mode-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition" data-questions="10">10問</button>
+                <button class="mode-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition" data-questions="30">30問</button>
+                <button class="mode-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition" data-questions="50">50問</button>
+                <button class="mode-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition" data-questions="100">100問</button>
+            </div>
+        </div>
+
+        <!-- ===== クイズ画面 ===== -->
+        <div id="quiz-screen" class="screen">
+            <div id="progress-container" class="mb-4">
+                <div id="progress-text" class="text-right font-bold text-gray-700 mb-1"></div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-blue-500 h-2.5 rounded-full transition-all duration-300"></div>
+                </div>
+            </div>
+            <div id="question-container">
+                <!-- 問題はJavaScriptでここに挿入されます -->
+            </div>
+            <button id="next-btn" class="w-full mt-6 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition hidden">次の問題へ</button>
+        </div>
+
+        <!-- ===== 結果画面 ===== -->
+        <div id="results-screen" class="screen text-center">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">クイズ結果</h2>
+            <div id="score-display" class="text-2xl font-bold my-6">
+                <span id="total-questions-result"></span>問中 <span class="text-4xl text-blue-500" id="score-result"></span>問 正解！
+            </div>
+            <p id="result-message" class="text-lg mb-8"></p>
+            <button id="restart-btn" class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition">もう一度挑戦する</button>
+        </div>
+    </div>
+
+    <!-- 全100問の問題データをここに保持（非表示） -->
+    <div id="all-questions-source" style="display: none;">
+        <!-- ここに100問分の .question-block を配置 -->
+        <div class="question-block">
+            <p class="question-title">問1【生き物】パンダの尻尾の色は何色でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_1" value="a"> A. 黒</label>
+                <label><input type="radio" name="q_1" value="b"> B. 白</label>
+                <label><input type="radio" name="q_1" value="c"> C. 灰色</label>
+                <label><input type="radio" name="q_1" value="d"> D. 黒と白のまだら</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 白</strong><br>多くの人が黒だと思いがちですが、実は白です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問2【生き物】キリンの睡眠時間は1日のうち、平均でどのくらいでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_2" value="a"> A. 約8時間</label>
+                <label><input type="radio" name="q_2" value="b"> B. 約2時間</label>
+                <label><input type="radio" name="q_2" value="c"> C. 約20分</label>
+                <label><input type="radio" name="q_2" value="d"> D. ほとんど眠らない</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 約20分</strong><br>数分間の短い睡眠を繰り返します。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問3【生き物】コアラが食べるユーカリには毒がありますが、なぜコアラは平気なのでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_3" value="a"> A. 肝臓で毒を分解できるから</label>
+                <label><input type="radio" name="q_3" value="b"> B. 毒のない種類のユーカリだけを食べるから</label>
+                <label><input type="radio" name="q_3" value="c"> C. 盲腸で毒を分解できるから</label>
+                <label><input type="radio" name="q_3" value="d"> D. 唾液に解毒作用があるから</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 盲腸で毒を分解できるから</strong><br>非常に長い盲腸で、ユーカリの毒を分解しています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問4【生き物】サイの角の主成分は、人間の体のある部分と同じです。それはどこでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_4" value="a"> A. 骨</label>
+                <label><input type="radio" name="q_4" value="b"> B. 歯</label>
+                <label><input type="radio" name="q_4" value="c"> C. 髪の毛や爪</label>
+                <label><input type="radio" name="q_4" value="d"> D. 皮膚</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 髪の毛や爪</strong><br>ケラチンというタンパク質でできています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問5【生き物】タコの心臓はいくつあるでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_5" value="a"> A. 1つ</label>
+                <label><input type="radio" name="q_5" value="b"> B. 2つ</label>
+                <label><input type="radio" name="q_5" value="c"> C. 3つ</label>
+                <label><input type="radio" name="q_5" value="d"> D. 8つ</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 3つ</strong><br>エラに血液を送る心臓が2つ、全身に送る心臓が1つあります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問6【生き物】ダチョウは脳みそとある体の部分を比べると、ある部分の方が大きいと言われます。それはどこでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_6" value="a"> A. 目玉</label>
+                <label><input type="radio" name="q_6" value="b"> B. 心臓</label>
+                <label><input type="radio" name="q_6" value="c"> C. 胃</label>
+                <label><input type="radio" name="q_6" value="d"> D. 足の爪</label>
+            </div>
+            <div class="feedback" data-correct="a"><strong>【正解】A. 目玉</strong><br>ダチョウの脳は目玉よりも小さいです。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問7【生き物】カバの汗の色は何色でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_7" value="a"> A. 透明</label>
+                <label><input type="radio" name="q_7" value="b"> B. 青色</label>
+                <label><input type="radio" name="q_7" value="c"> C. 赤色</label>
+                <label><input type="radio" name="q_7" value="d"> D. 黒色</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 赤色</strong><br>正確には汗ではなく、皮膚を守るための赤い分泌液です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問8【生き物】ラッコが寝るとき、流されないように体に巻きつけるものは何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_8" value="a"> A. 仲間のラッコの手</label>
+                <label><input type="radio" name="q_8" value="b"> B. 海藻</label>
+                <label><input type="radio" name="q_8" value="c"> C. 自分の尻尾</label>
+                <label><input type="radio" name="q_8" value="d"> D. 貝殻</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 海藻</strong><br>コンブなどの海藻に体を巻きつけて休みます。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問9【生き物】フラミンゴの体がピンク色なのは、何を食べているからでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_9" value="a"> A. イチゴ</label>
+                <label><input type="radio" name="q_9" value="b"> B. 赤い花</label>
+                <label><input type="radio" name="q_9" value="c"> C. エビやカニ</label>
+                <label><input type="radio" name="q_9" value="d"> D. 赤土</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. エビやカニ</strong><br>エビやカニに含まれる色素が体に蓄積するためです。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問10【生き物】ワニは食事の際、ある液体を流しながら食べます。それは何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_10" value="a"> A. よだれ</label>
+                <label><input type="radio" name="q_10" value="b"> B. 涙</label>
+                <label><input type="radio" name="q_10" value="c"> C. 鼻水</label>
+                <label><input type="radio" name="q_10" value="d"> D. 汗</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 涙</strong><br>「ワニの涙」の語源。生理現象であり、悲しいわけではありません。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問11【生き物】カメレオンが体の色を変える一番の理由は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_11" value="a"> A. 敵から身を隠すため</label>
+                <label><input type="radio" name="q_11" value="b"> B. 気分や体調を伝えるため</label>
+                <label><input type="radio" name="q_11" value="c"> C. 求愛のため</label>
+                <label><input type="radio" name="q_11" value="d"> D. 食べたものの色になるため</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 気分や体調を伝えるため</strong><br>保護色のためだけではなく、コミュニケーション手段として色を変えます。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問12【生き物】「森のバター」はアボカドですが、「森の医者」と呼ばれる鳥は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_12" value="a"> A. フクロウ</label>
+                <label><input type="radio" name="q_12" value="b"> B. カラス</label>
+                <label><input type="radio" name="q_12" value="c"> C. キツツキ</label>
+                <label><input type="radio" name="q_12" value="d"> D. ハト</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. キツツキ</strong><br>木の中の害虫を食べてくれるためです。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問13【生き物】ペンギンは鳥なのに空を飛べませんが、その代わりに何が得意でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_13" value="a"> A. 穴を掘ること</label>
+                <label><input type="radio" name="q_13" value="b"> B. 木に登ること</label>
+                <label><input type="radio" name="q_13" value="c"> C. 速く走ること</label>
+                <label><input type="radio" name="q_13" value="d"> D. 水中を泳ぐこと</label>
+            </div>
+            <div class="feedback" data-correct="d"><strong>【正解】D. 水中を泳ぐこと</strong><br>翼を使って、まるで水中を飛ぶように巧みに泳ぎます。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問14【生き物】蚊に刺されたとき、血を吸うのはオスとメス、どちらでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_14" value="a"> A. オス</label>
+                <label><input type="radio" name="q_14" value="b"> B. メス</label>
+                <label><input type="radio" name="q_14" value="c"> C. 両方</label>
+                <label><input type="radio" name="q_14" value="d"> D. 種類による</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. メス</strong><br>産卵のための栄養を摂るために血を吸います。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問15【生き物】シマウマの縞模様の一番の役割は何だと考えられているでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_15" value="a"> A. 敵の目をくらませるため</label>
+                <label><input type="radio" name="q_15" value="b"> B. 仲間を見分けるため</label>
+                <label><input type="radio" name="q_15" value="c"> C. 吸血性のハエなどを避けるため</label>
+                <label><input type="radio" name="q_15" value="d"> D. 体温を調節するため</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 吸血性のハエなどを避けるため</strong><br>縞模様がハエの視覚を混乱させ、止まりにくくするという説が有力です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問16【食べ物】パイナップルを食べると舌がピリピリすることがあるのは、何という酵素が含まれているからでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_16" value="a"> A. ペプシン</label>
+                <label><input type="radio" name="q_16" value="b"> B. アミラーゼ</label>
+                <label><input type="radio" name="q_16" value="c"> C. ブロメライン</label>
+                <label><input type="radio" name="q_16" value="d"> D. リパーゼ</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. ブロメライン</strong><br>タンパク質を分解する酵素で、舌の粘膜を刺激します。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問17【食べ物】きゅうりは、ある野菜としてギネス世界記録に認定されています。それは何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_17" value="a"> A. 最も長く育つ野菜</label>
+                <label><input type="radio" name="q_17" value="b"> B. 最も多く収穫される野菜</label>
+                <label><input type="radio" name="q_17" value="c"> C. 最も栄養価が低い果菜</label>
+                <label><input type="radio" name="q_17" value="d"> D. 最も水分が多い野菜</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 最も栄養価が低い果菜</strong><br>Least calorific fruitとして認定されています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問18【食べ物】納豆のネバネバの正体である、アミノ酸からできている成分の名前は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_18" value="a"> A. ヒアルロン酸</label>
+                <label><input type="radio" name="q_18" value="b"> B. ポリグルタミン酸</label>
+                <label><input type="radio" name="q_18" value="c"> C. コラーゲン</label>
+                <label><input type="radio" name="q_18" value="d"> D. グルテン</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. ポリグルタミン酸</strong><br>うま味成分の一種であるグルタミン酸が長くつながったものです。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問19【食べ物】イチゴの表面にあるツブツブは、植物学的には何と呼ばれる部分でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_19" value="a"> A. 種</label>
+                <label><input type="radio" name="q_19" value="b"> B. 果実</label>
+                <label><input type="radio" name="q_19" value="c"> C. 胞子</label>
+                <label><input type="radio" name="q_19" value="d"> D. 根</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 果実</strong><br>私たちが果実だと思って食べている赤い部分は「花托」です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問20【食べ物】寿司屋で使われる「ガリ」。なぜそう呼ばれるようになったのでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_20" value="a"> A. 発明者の名前から</label>
+                <label><input type="radio" name="q_20" value="b"> B. 食べるときの「ガリガリ」という音から</label>
+                <label><input type="radio" name="q_20" value="c"> C. 見た目ががり痩せしているから</label>
+                <label><input type="radio" name="q_20" value="d"> D. 材料の生姜の品種名から</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 食べるときの「ガリガリ」という音から</strong><br>食感や、包丁で刻むときの音が由来とされています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問21【食べ物】世界三大珍味は「キャビア」「フォアグラ」と、あと一つは何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_21" value="a"> A. フカヒレ</label>
+                <label><input type="radio" name="q_21" value="b"> B. トリュフ</label>
+                <label><input type="radio" name="q_21" value="c"> C. エスカルゴ</label>
+                <label><input type="radio" name="q_21" value="d"> D. マツタケ</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. トリュフ</strong><br>独特の香りを持つ高級キノコです。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問22【食べ物】「シーチキン」という名前の由来は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_22" value="a"> A. 海の鶏（チキン）のように美味しいから</label>
+                <label><input type="radio" name="q_22" value="b"> B. 発明者の名前が「シー」さんだったから</label>
+                <label><input type="radio" name="q_22" value="c"> C. 最初に獲れた海域の名前から</label>
+                <label><input type="radio" name="q_22" value="d"> D. 見た目が鶏肉に似ているから</label>
+            </div>
+            <div class="feedback" data-correct="a"><strong>【正解】A. 海の鶏（チキン）のように美味しいから</strong><br>鶏のささみのように淡白で美味しい海の幸、という意味が込められています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問23【食べ物】アイスクリームの賞味期限はどうなっているでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_23" value="a"> A. 製造から1年</label>
+                <label><input type="radio" name="q_23" value="b"> B. 製造から半年</label>
+                <label><input type="radio" name="q_23" value="c"> C. 表示義務がない</label>
+                <label><input type="radio" name="q_23" value="d"> D. 製造から3ヶ月</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 表示義務がない</strong><br>-18℃以下で保存されていれば細菌が増殖しにくく、品質が安定しているためです。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問24【食べ物】ブロッコリーとカリフラワーは、元々は何という野菜を品種改良したものでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_24" value="a"> A. レタス</label>
+                <label><input type="radio" name="q_24" value="b"> B. ケール</label>
+                <label><input type="radio" name="q_24" value="c"> C. ホウレンソウ</label>
+                <label><input type="radio" name="q_24" value="d"> D. アスパラガス</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. ケール</strong><br>キャベツや芽キャベツも同じケールの仲間です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問25【食べ物】「おでん」という名前は、元々ある料理の名前が変化したものです。その料理とは何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_25" value="a"> A. 田楽</label>
+                <label><input type="radio" name="q_25" value="b"> B. 寄せ鍋</label>
+                <label><input type="radio" name="q_25" value="c"> C. 煮物</label>
+                <label><input type="radio" name="q_25" value="d"> D. 湯豆腐</label>
+            </div>
+            <div class="feedback" data-correct="a"><strong>【正解】A. 田楽</strong><br>「御田楽（おでんがく）」の女房言葉「おでん」が由来です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問26【食べ物】コーヒー豆は、植物学的には「豆」ではありません。では何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_26" value="a"> A. 果実</label>
+                <label><input type="radio" name="q_26" value="b"> B. 茎</label>
+                <label><input type="radio" name="q_26" value="c"> C. 根</label>
+                <label><input type="radio" name="q_26" value="d"> D. 種子</label>
+            </div>
+            <div class="feedback" data-correct="d"><strong>【正解】D. 種子</strong><br>コーヒーチェリーという果実の種です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問27【食べ物】パセリには口臭を消す効果がありますが、特にどんな料理の臭いに効くでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_27" value="a"> A. 魚料理</label>
+                <label><input type="radio" name="q_27" value="b"> B. ニンニク料理</label>
+                <label><input type="radio" name="q_27" value="c"> C. 乳製品</label>
+                <label><input type="radio" name="q_27" value="d"> D. 納豆</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. ニンニク料理</strong><br>パセリの香り成分「アピオール」がニンニクの臭いを抑えます。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問28【食べ物】フランスパンに斜めの切れ込み（クープ）が入っている一番の理由は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_28" value="a"> A. デザインのため</label>
+                <label><input type="radio" name="q_28" value="b"> B. パン屋のサインのため</label>
+                <label><input type="radio" name="q_28" value="c"> C. 均一に膨らませ、火の通りを良くするため</label>
+                <label><input type="radio" name="q_28" value="d"> D. 食べやすくするため</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 均一に膨らませ、火の通りを良くするため</strong><br>切れ込みがないと、不規則に破裂してしまいます。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問29【食べ物】アボカドは野菜でしょうか？果物でしょうか？</p>
+            <div class="options">
+                <label><input type="radio" name="q_29" value="a"> A. 野菜</label>
+                <label><input type="radio" name="q_29" value="b"> B. 果物</label>
+                <label><input type="radio" name="q_29" value="c"> C. どちらでもない</label>
+                <label><input type="radio" name="q_29" value="d"> D. 豆類</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 果物</strong><br>木になる実なので、植物学的には果物に分類されます。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問30【食べ物】日本で初めてラーメンを食べたとされる歴史上の人物は誰でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_30" value="a"> A. 織田信長</label>
+                <label><input type="radio" name="q_30" value="b"> B. 徳川家康</label>
+                <label><input type="radio" name="q_30" value="c"> C. 水戸光圀</label>
+                <label><input type="radio" name="q_30" value="d"> D. 坂本龍馬</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 水戸光圀</strong><br>水戸黄門として知られる徳川光圀が、中国から伝わった麺を食べたとされています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問31【体】人間の体で一番硬い部分はどこでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_31" value="a"> A. 頭蓋骨</label>
+                <label><input type="radio" name="q_31" value="b"> B. 大腿骨</label>
+                <label><input type="radio" name="q_31" value="c"> C. 歯のエナメル質</label>
+                <label><input type="radio" name="q_31" value="d"> D. かかとの骨</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 歯のエナメル質</strong><br>水晶と同じくらいの硬さがあります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問32【体】人間の血管をすべてつなぎ合わせると、地球を何周する長さになるでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_32" value="a"> A. 約半周</label>
+                <label><input type="radio" name="q_32" value="b"> B. 約1周</label>
+                <label><input type="radio" name="q_32" value="c"> C. 約2周半</label>
+                <label><input type="radio" name="q_32" value="d"> D. 約5周</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 約2周半</strong><br>全長は約10万kmにもなります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問33【体】くしゃみの速さは、時速にするとどのくらいでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_33" value="a"> A. 時速100km</label>
+                <label><input type="radio" name="q_33" value="b"> B. 時速200km</label>
+                <label><input type="radio" name="q_33" value="c"> C. 時速300km以上</label>
+                <label><input type="radio" name="q_33" value="d"> D. 時速50km</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 時速300km以上</strong><br>新幹線並みの速さです。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問34【体】人間は一生のうち、平均でどのくらいの量の唾液を出すでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_34" value="a"> A. バスタブ1杯分</label>
+                <label><input type="radio" name="q_34" value="b"> B. プール1〜2杯分</label>
+                <label><input type="radio" name="q_34" value="c"> C. ドラム缶1本分</label>
+                <label><input type="radio" name="q_34" value="d"> D. ペットボトル100本分</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. プール1〜2杯分</strong><br>1日に1〜1.5リットルも分泌されます。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問35【体】指紋と同じように、人それぞれ模様が違う体の部分はどこでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_35" value="a"> A. 耳の形</label>
+                <label><input type="radio" name="q_35" value="b"> B. 舌の模様（舌紋）</label>
+                <label><input type="radio" name="q_35" value="c"> C. 髪のつむじ</label>
+                <label><input type="radio" name="q_35" value="d"> D. ほくろの位置</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 舌の模様（舌紋）</strong><br>舌の表面の模様も一人ひとり異なります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問36【体】人間の体で、唯一生まれ変わらない（再生しない）細胞は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_36" value="a"> A. 皮膚の細胞</label>
+                <label><input type="radio" name="q_36" value="b"> B. 血液の細胞</label>
+                <label><input type="radio" name="q_36" value="c"> C. 脳の神経細胞</label>
+                <label><input type="radio" name="q_36" value="d"> D. 骨の細胞</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 脳の神経細胞</strong><br>心臓の筋肉の細胞（心筋細胞）もほとんど再生しません。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問37【体】人間の赤ちゃんは、大人より骨の数が多いでしょうか？少ないでしょうか？</p>
+            <div class="options">
+                <label><input type="radio" name="q_37" value="a"> A. 多い</label>
+                <label><input type="radio" name="q_37" value="b"> B. 少ない</label>
+                <label><input type="radio" name="q_37" value="c"> C. 同じ</label>
+                <label><input type="radio" name="q_37" value="d"> D. 個人差が大きい</label>
+            </div>
+            <div class="feedback" data-correct="a"><strong>【正解】A. 多い</strong><br>生まれたときは約305個あり、成長するにつれていくつかの骨がくっつき、約206個になります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問38【体】人間の体で、痛みを感じない臓器は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_38" value="a"> A. 胃</label>
+                <label><input type="radio" name="q_38" value="b"> B. 肝臓</label>
+                <label><input type="radio" name="q_38" value="c"> C. 脳</label>
+                <label><input type="radio" name="q_38" value="d"> D. 肺</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 脳</strong><br>脳自体には痛みを感じる神経（痛点）がありません。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問39【体】あくびが出る一番の理由は何だと考えられているでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_39" value="a"> A. 眠いから</label>
+                <label><input type="radio" name="q_39" value="b"> B. 脳の温度を下げるため</label>
+                <label><input type="radio" name="q_39" value="c"> C. 血中の酸素が足りないから</label>
+                <label><input type="radio" name="q_39" value="d"> D. 退屈だから</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 脳の温度を下げるため</strong><br>脳のクールダウンのためにあくびが出る、という説が有力です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問40【体】人間の体で最も大きい臓器は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_40" value="a"> A. 肝臓</label>
+                <label><input type="radio" name="q_40" value="b"> B. 脳</label>
+                <label><input type="radio" name="q_40" value="c"> C. 腸</label>
+                <label><input type="radio" name="q_40" value="d"> D. 皮膚</label>
+            </div>
+            <div class="feedback" data-correct="d"><strong>【正解】D. 皮膚</strong><br>体を覆う最大の臓器です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問41【体】緊張するとトイレが近くなるのはなぜでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_41" value="a"> A. 水分を多く摂るから</label>
+                <label><input type="radio" name="q_41" value="b"> B. 膀胱が収縮するため</label>
+                <label><input type="radio" name="q_41" value="c"> C. 腎臓の働きが活発になるから</label>
+                <label><input type="radio" name="q_41" value="d"> D. 体温が上がるから</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 膀胱が収縮するため</strong><br>交感神経が活発になり、膀胱が過敏に反応します。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問42【体】人間のDNAと、ある果物のDNAは約50%が一致します。その果物とは何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_42" value="a"> A. リンゴ</label>
+                <label><input type="radio" name="q_42" value="b"> B. イチゴ</label>
+                <label><input type="radio" name="q_42" value="c"> C. バナナ</label>
+                <label><input type="radio" name="q_42" value="d"> D. ブドウ</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. バナナ</strong><br>生物の基本的な設計図には共通点が多いためです。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問43【体】眉毛は何のためにあるのでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_43" value="a"> A. 汗や雨が目に入るのを防ぐため</label>
+                <label><input type="radio" name="q_43" value="b"> B. 表情を豊かにするため</label>
+                <label><input type="radio" name="q_43" value="c"> C. 顔のバランスをとるため</label>
+                <label><input type="radio" name="q_43" value="d"> D. 昔の毛の名残</label>
+            </div>
+            <div class="feedback" data-correct="a"><strong>【正解】A. 汗や雨が目に入るのを防ぐため</strong><br>額から流れる汗を左右に受け流す役割があります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問44【体】人間の骨の中で、最も小さい骨はどこにあるでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_44" value="a"> A. 指先</label>
+                <label><input type="radio" name="q_44" value="b"> B. 鼻</label>
+                <label><input type="radio" name="q_44" value="c"> C. 耳</label>
+                <label><input type="radio" name="q_44" value="d"> D. 歯</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 耳</strong><br>耳の中にあるアブミ骨という骨です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問45【体】人間が一生で歩く距離は、平均で地球を何周する分に相当するでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_45" value="a"> A. 約1周</label>
+                <label><input type="radio" name="q_45" value="b"> B. 約3周</label>
+                <label><input type="radio" name="q_45" value="c"> C. 約5周</label>
+                <label><input type="radio" name="q_45" value="d"> D. 約10周</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 約3周</strong><br>約11万km〜12万km歩く計算になります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問46【科学】虹が7色に見えるのはなぜでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_46" value="a"> A. 光が7種類の色でできているから</label>
+                <label><input type="radio" name="q_46" value="b"> B. 光が水滴で屈折・反射し、色が分かれるから</label>
+                <label><input type="radio" name="q_46" value="c"> C. 空気に7つの層があるから</label>
+                <label><input type="radio" name="q_46" value="d"> D. 人間の目が7色しか認識できないから</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 光が水滴で屈折・反射し、色が分かれるから</strong><br>太陽の光が空気中の水滴をプリズム代わりにして分散するためです。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問47【科学】雷が光ってから音が聞こえるまでに時間がかかるのはなぜでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_47" value="a"> A. 音が遠回りするから</label>
+                <label><input type="radio" name="q_47" value="b"> B. 光の速さが音の速さよりずっと速いから</label>
+                <label><input type="radio" name="q_47" value="c"> C. 光と音が違う場所から発生するから</label>
+                <label><input type="radio" name="q_47" value="d"> D. 人間の脳の処理速度の問題</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 光の速さが音の速さよりずっと速いから</strong><br>光は1秒で地球を7周半しますが、音は1秒で約340mしか進みません。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問48【科学】宇宙空間は無音ですが、それはなぜでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_48" value="a"> A. 音を伝える空気がないから</label>
+                <label><input type="radio" name="q_48" value="b"> B. 温度が低すぎるから</label>
+                <label><input type="radio" name="q_48" value="c"> C. 圧力が低すぎるから</label>
+                <label><input type="radio" name="q_48" value="d"> D. 宇宙が広すぎるから</label>
+            </div>
+            <div class="feedback" data-correct="a"><strong>【正解】A. 音を伝える空気がないから</strong><br>音は物質の振動によって伝わるため、媒体のない真空の宇宙では伝わりません。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問49【科学】地球上で最も乾燥している場所はどこでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_49" value="a"> A. サハラ砂漠</label>
+                <label><input type="radio" name="q_49" value="b"> B. ゴビ砂漠</label>
+                <label><input type="radio" name="q_49" value="c"> C. 南極大陸</label>
+                <label><input type="radio" name="q_49" value="d"> D. アタカマ砂漠</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 南極大陸</strong><br>極地のため降水量が極めて少なく、巨大な砂漠とされています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問50【科学】流れ星の正体は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_50" value="a"> A. 遠くの星が爆発した光</label>
+                <label><input type="radio" name="q_50" value="b"> B. 人工衛星の破片</label>
+                <label><input type="radio" name="q_50" value="c"> C. 宇宙の小さなチリ</label>
+                <label><input type="radio" name="q_50" value="d"> D. 彗星そのもの</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 宇宙の小さなチリ</strong><br>直径数ミリ〜数センチのチリが地球の大気に突入し、燃え尽きる時に光ります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問51【科学】ダイヤモンドと鉛筆の芯は、同じ元素からできています。その元素とは何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_51" value="a"> A. ケイ素</label>
+                <label><input type="radio" name="q_51" value="b"> B. 鉄</label>
+                <label><input type="radio" name="q_51" value="c"> C. 炭素</label>
+                <label><input type="radio" name="q_51" value="d"> D. アルミニウム</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 炭素</strong><br>原子の並び方（結晶構造）が違うだけで、同じ炭素からできています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問52【科学】金星では、1日は1年より長いでしょうか？短いでしょうか？</p>
+            <div class="options">
+                <label><input type="radio" name="q_52" value="a"> A. 長い</label>
+                <label><input type="radio" name="q_52" value="b"> B. 短い</label>
+                <label><input type="radio" name="q_52" value="c"> C. ほぼ同じ</label>
+                <label><input type="radio" name="q_52" value="d"> D. 測定不能</label>
+            </div>
+            <div class="feedback" data-correct="a"><strong>【正解】A. 長い</strong><br>自転周期（1日）が約243日、公転周期（1年）が約225日のため、1日の方が長くなります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問53【科学】ガラスは何からできているでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_53" value="a"> A. 石灰岩</label>
+                <label><input type="radio" name="q_53" value="b"> B. 粘土</label>
+                <label><input type="radio" name="q_53" value="c"> C. 砂</label>
+                <label><input type="radio" name="q_53" value="d"> D. 石膏</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 砂</strong><br>主成分は砂に含まれる二酸化ケイ素です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問54【科学】雲が空に浮かんでいられるのはなぜでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_54" value="a"> A. 雲は空気より軽いから</label>
+                <label><input type="radio" name="q_54" value="b"> B. 落下速度より上昇気流が強いから</label>
+                <label><input type="radio" name="q_54" value="c"> C. 太陽の熱で温められているから</label>
+                <label><input type="radio" name="q_54" value="d"> D. 静電気で浮かんでいるから</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 落下速度より上昇気流が強いから</strong><br>雲の粒は非常に小さく軽いため、わずかな上昇気流で空に留まっていられます。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問55【科学】土星の輪の正体は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_55" value="a"> A. ガスの帯</label>
+                <label><input type="radio" name="q_55" value="b"> B. 塵の雲</label>
+                <label><input type="radio" name="q_55" value="c"> C. 無数の氷の粒や岩石</label>
+                <label><input type="radio" name="q_55" value="d"> D. 光の反射</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 無数の氷の粒や岩石</strong><br>数センチから数メートルの氷の塊などが、土星の周りを公転しています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問56【科学】太陽の光が地球に届くまで、どのくらいの時間がかかるでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_56" value="a"> A. 約8秒</label>
+                <label><input type="radio" name="q_56" value="b"> B. 約8分20秒</label>
+                <label><input type="radio" name="q_56" value="c"> C. 約8時間</label>
+                <label><input type="radio" name="q_56" value="d"> D. 約1日</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 約8分20秒</strong><br>太陽と地球の距離は約1億5000万kmあります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問57【科学】世界で初めて「もしもし」と電話で言ったとされる発明家は誰でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_57" value="a"> A. グラハム・ベル</label>
+                <label><input type="radio" name="q_57" value="b"> B. トーマス・エジソン</label>
+                <label><input type="radio" name="q_57" value="c"> C. ライト兄弟</label>
+                <label><input type="radio" name="q_57" value="d"> D. アルフレッド・ノーベル</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. トーマス・エジソン</strong><br>電話の発明者ベルは「Ahoy（アホイ）」を提案していました。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問58【科学】元素記号「Fe」は何という金属でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_58" value="a"> A. 金</label>
+                <label><input type="radio" name="q_58" value="b"> B. 銀</label>
+                <label><input type="radio" name="q_58" value="c"> C. 銅</label>
+                <label><input type="radio" name="q_58" value="d"> D. 鉄</label>
+            </div>
+            <div class="feedback" data-correct="d"><strong>【正解】D. 鉄</strong><br>ラテン語の "ferrum" に由来します。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問59【科学】宇宙服は一着およそいくらするでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_59" value="a"> A. 約1000万円</label>
+                <label><input type="radio" name="q_59" value="b"> B. 約5000万円</label>
+                <label><input type="radio" name="q_59" value="c"> C. 約1億円</label>
+                <label><input type="radio" name="q_59" value="d"> D. 10億円以上</label>
+            </div>
+            <div class="feedback" data-correct="d"><strong>【正解】D. 10億円以上</strong><br>生命維持装置など、最新技術の塊だからです。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問60【科学】蜃気楼が見える原理は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_60" value="a"> A. 光の反射</label>
+                <label><input type="radio" name="q_60" value="b"> B. 光の屈折</label>
+                <label><input type="radio" name="q_60" value="c"> C. 光の回折</label>
+                <label><input type="radio" name="q_60" value="d"> D. 目の錯覚</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 光の屈折</strong><br>温度差のある空気の層を光が通ることで、景色が歪んだり逆さに見えたりします。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問61【歴史・文化】エジプトのピラミッドは何のために作られたものでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_61" value="a"> A. 王の墓</label>
+                <label><input type="radio" name="q_61" value="b"> B. 天文台</label>
+                <label><input type="radio" name="q_61" value="c"> C. 穀物倉庫</label>
+                <label><input type="radio" name="q_61" value="d"> D. 神殿</label>
+            </div>
+            <div class="feedback" data-correct="a"><strong>【正解】A. 王の墓</strong><br>古代エジプトのファラオ（王）の墓として建設されました。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問62【歴史・文化】「ジャンケン」は、もともとどこの国で生まれた遊びでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_62" value="a"> A. 中国</label>
+                <label><input type="radio" name="q_62" value="b"> B. 日本</label>
+                <label><input type="radio" name="q_62" value="c"> C. インド</label>
+                <label><input type="radio" name="q_62" value="d"> D. エジプト</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 日本</strong><br>江戸時代に中国から伝わった拳遊びが元になり、日本で現在の形になりました。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問63【歴史・文化】ジーンズのポケットについている小さなポケットは、もともと何を入れるためのものでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_63" value="a"> A. コイン</label>
+                <label><input type="radio" name="q_63" value="b"> B. 懐中時計</label>
+                <label><input type="radio" name="q_63" value="c"> C. 鍵</label>
+                <label><input type="radio" name="q_63" value="d"> D. 弾丸</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 懐中時計</strong><br>ウォッチポケットと呼ばれ、懐中時計を傷つけずに入れるためのものでした。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問64【歴史・文化】自由の女神が右手に掲げているものは松明ですが、左手に持っているものは何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_64" value="a"> A. 聖書</label>
+                <label><input type="radio" name="q_64" value="b"> B. 六法全書</label>
+                <label><input type="radio" name="q_64" value="c"> C. 独立宣言書</label>
+                <label><input type="radio" name="q_64" value="d"> D. 地球儀</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 独立宣言書</strong><br>アメリカの独立を記念した銘板を抱えています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問65【歴史・文化】オリンピックの金メダルは、主に何という金属でできているでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_65" value="a"> A. 金</label>
+                <label><input type="radio" name="q_65" value="b"> B. 銀</label>
+                <label><input type="radio" name="q_65" value="c"> C. 銅</label>
+                <label><input type="radio" name="q_65" value="d"> D. プラチナ</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 銀</strong><br>純銀製のメダルに、6グラム以上の金メッキを施したものと規定されています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問66【歴史・文化】「ごちそうさま」の「馳走」とは、もともとどういう意味でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_66" value="a"> A. 豪華な食事</label>
+                <label><input type="radio" name="q_66" value="b"> B. 走り回ること</label>
+                <label><input type="radio" name="q_66" value="c"> C. 神様へのお供え</label>
+                <label><input type="radio" name="q_66" value="d"> D. みんなで食べること</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 走り回ること</strong><br>食事の準備のために馬で走り回って食材を集めたことから、感謝を表す言葉になりました。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問67【歴史・文化】サンドイッチの名前の由来となったサンドウィッチ伯爵は、なぜパンに具を挟んで食べたのでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_67" value="a"> A. 読書をしながら食べるため</label>
+                <label><input type="radio" name="q_67" value="b"> B. トランプをしながら食べるため</label>
+                <label><input type="radio" name="q_67" value="c"> C. 乗馬をしながら食べるため</label>
+                <label><input type="radio" name="q_67" value="d"> D. 手を汚したくなかったから</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. トランプをしながら食べるため</strong><br>大好きなカードゲームを中断せずに食事をしたかったからだと言われています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問68【歴史・文化】レオナルド・ダ・ヴィンチの有名な絵画「モナ・リザ」には、あるはずのものが描かれていません。それは何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_68" value="a"> A. 鼻</label>
+                <label><input type="radio" name="q_68" value="b"> B. 耳</label>
+                <label><input type="radio" name="q_68" value="c"> C. 眉毛</label>
+                <label><input type="radio" name="q_68" value="d"> D. 唇</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 眉毛</strong><br>描かれていない理由は諸説あり、未だ謎に包まれています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問69【歴史・文化】「賽は投げられた」という有名な言葉を残した古代ローマの人物は誰でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_69" value="a"> A. ネロ</label>
+                <label><input type="radio" name="q_69" value="b"> B. アウグストゥス</label>
+                <label><input type="radio" name="q_69" value="c"> C. ユリウス・カエサル</label>
+                <label><input type="radio" name="q_69" value="d"> D. ブルータス</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. ユリウス・カエサル</strong><br>後戻りできない状況で決断を下す際に使われる言葉です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問70【歴史・文化】日本のお城の屋根に乗っている魚の飾りを何と呼ぶでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_70" value="a"> A. 鬼瓦</label>
+                <label><input type="radio" name="q_70" value="b"> B. 鯱（しゃちほこ）</label>
+                <label><input type="radio" name="q_70" value="c"> C. 懸魚（げぎょ）</label>
+                <label><input type="radio" name="q_70" value="d"> D. 鯉のぼり</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 鯱（しゃちほこ）</strong><br>火事の際に水を噴き出して城を守るという伝説があります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問71【歴史・文化】トランプのキング（王様）の中で、一人だけ口ひげがないのは誰でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_71" value="a"> A. スペードのキング</label>
+                <label><input type="radio" name="q_71" value="b"> B. クラブのキング</label>
+                <label><input type="radio" name="q_71" value="c"> C. ダイヤのキング</label>
+                <label><input type="radio" name="q_71" value="d"> D. ハートのキング</label>
+            </div>
+            <div class="feedback" data-correct="d"><strong>【正解】D. ハートのキング</strong><br>モデルとなった人物が若くして亡くなったため、という説があります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問72【歴史・文化】「OK」という言葉の由来として最も有力な説は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_72" value="a"> A. "Oll Korrect" の頭文字</label>
+                <label><input type="radio" name="q_72" value="b"> B. 大統領のニックネームから</label>
+                <label><input type="radio" name="q_72" value="c"> C. インディアンの言葉から</label>
+                <label><input type="radio" name="q_72" value="d"> D. "Okayama" の略</label>
+            </div>
+            <div class="feedback" data-correct="a"><strong>【正解】A. "Oll Korrect" の頭文字</strong><br>"All Correct" のスペルをわざと間違えて略したスラングが流行した、という説が有力です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問73【歴史・文化】タキシードのことを、イギリスでは何と呼ぶでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_73" value="a"> A. スモーキングジャケット</label>
+                <label><input type="radio" name="q_73" value="b"> B. ディナージャケット</label>
+                <label><input type="radio" name="q_73" value="c"> C. イブニングコート</label>
+                <label><input type="radio" name="q_73" value="d"> D. ブラックタイ</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. ディナージャケット</strong><br>アメリカではタキシード、イギリスではディナージャケットと呼ばれます。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問74【歴史・文化】日本で一番多い名字は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_74" value="a"> A. 田中</label>
+                <label><input type="radio" name="q_74" value="b"> B. 鈴木</label>
+                <label><input type="radio" name="q_74" value="c"> C. 佐藤</label>
+                <label><input type="radio" name="q_74" value="d"> D. 高橋</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 佐藤</strong><br>全国に約180万人以上いるとされています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問75【歴史・文化】大仏の頭にあるブツブツの名前は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_75" value="a"> A. 螺髪（らほつ）</label>
+                <label><input type="radio" name="q_75" value="b"> B. 白毫（びゃくごう）</label>
+                <label><input type="radio" name="q_75" value="c"> C. 肉髻（にっけい）</label>
+                <label><input type="radio" name="q_75" value="d"> D. 智慧（ちえ）</label>
+            </div>
+            <div class="feedback" data-correct="a"><strong>【正解】A. 螺髪（らほつ）</strong><br>ブッダの優れた特徴の一つで、右巻きの巻貝のような髪の毛です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問76【言葉】「画竜点睛」の「睛」とは、体のどの部分のことでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_76" value="a"> A. 爪</label>
+                <label><input type="radio" name="q_76" value="b"> B. 瞳</label>
+                <label><input type="radio" name="q_76" value="c"> C. 鱗</label>
+                <label><input type="radio" name="q_76" value="d"> D. 牙</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 瞳</strong><br>竜の絵の最後に瞳を描き入れたら、竜が天に昇ったという故事から来ています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問77【言葉】鉛筆の濃さを表す「H」と「B」。それぞれ何の英単語の略でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_77" value="a"> A. HighとBase</label>
+                <label><input type="radio" name="q_77" value="b"> B. HardとBlack</label>
+                <label><input type="radio" name="q_77" value="c"> C. HeavyとBright</label>
+                <label><input type="radio" name="q_77" value="d"> D. HeightとBold</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. HardとBlack</strong><br>Hは硬い芯、Bは黒く濃い芯を意味します。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問78【言葉】ピアノの鍵盤の数は、全部でいくつでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_78" value="a"> A. 76鍵</label>
+                <label><input type="radio" name="q_78" value="b"> B. 88鍵</label>
+                <label><input type="radio" name="q_78" value="c"> C. 92鍵</label>
+                <label><input type="radio" name="q_78" value="d"> D. 108鍵</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 88鍵</strong><br>白鍵が52、黒鍵が36です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問79【言葉】バーコードの線の隣にある数字。最初の2桁（または3桁）は何を表しているでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_79" value="a"> A. 商品の価格</label>
+                <label><input type="radio" name="q_79" value="b"> B. 製造年月日</label>
+                <label><input type="radio" name="q_79" value="c"> C. 国番号</label>
+                <label><input type="radio" name="q_79" value="d"> D. 商品の種類</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 国番号</strong><br>どの国の企業が登録したかを示します。日本は45または49から始まります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問80【言葉】郵便ポストの色が赤いのはなぜでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_80" value="a"> A. 法律で決まっているから</label>
+                <label><input type="radio" name="q_80" value="b"> B. 遠くからでも目立つようにするため</label>
+                <label><input type="radio" name="q_80" value="c"> C. 赤いペンキが一番安かったから</label>
+                <label><input type="radio" name="q_80" value="d"> D. 郵便のシンボルカラーだから</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 遠くからでも目立つようにするため</strong><br>元々はイギリスのポストを真似たもので、視認性の高さから赤が採用されました。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問81【言葉】乾杯のとき、グラスをカチンと合わせるのはなぜでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_81" value="a"> A. 良い音を立てるため</label>
+                <label><input type="radio" name="q_81" value="b"> B. 飲み物に毒が入っていない証明のため</label>
+                <label><input type="radio" name="q_81" value="c"> C. 神への感謝を示すため</label>
+                <label><input type="radio" name="q_81" value="d"> D. グラスの強度を確かめるため</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 飲み物に毒が入っていない証明のため</strong><br>昔、グラスを合わせて中身を交換し合った名残という説や、悪魔払いの儀式だったという説があります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問82【言葉】「エコひいき」の「エコ」とは、どういう意味でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_82" value="a"> A. エコロジー</label>
+                <label><input type="radio" name="q_82" value="b"> B. エコノミー</label>
+                <label><input type="radio" name="q_82" value="c"> C. 依怙（えこ）</label>
+                <label><input type="radio" name="q_82" value="d"> D. エコー（反響）</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 依怙（えこ）</strong><br>仏教用語で、一方にだけ肩入れするという意味です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問83【言葉】信号機の色は「赤・黄・青」ですが、法律上の正式名称では「青」ではなく何色と定められているでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_83" value="a"> A. 青色</label>
+                <label><input type="radio" name="q_83" value="b"> B. 水色</label>
+                <label><input type="radio" name="q_83" value="c"> C. 藍色</label>
+                <label><input type="radio" name="q_83" value="d"> D. 緑色</label>
+            </div>
+            <div class="feedback" data-correct="d"><strong>【正解】D. 緑色</strong><br>道路交通法施行令では「緑色の灯火」と定められています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問84【言葉】「サウナ」とは、もともと何語でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_84" value="a"> A. ドイツ語</label>
+                <label><input type="radio" name="q_84" value="b"> B. スウェーデン語</label>
+                <label><input type="radio" name="q_84" value="c"> C. フィンランド語</label>
+                <label><input type="radio" name="q_84" value="d"> D. ロシア語</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. フィンランド語</strong><br>フィンランド発祥の蒸し風呂です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問85【言葉】「ドレミファソラシド」はイタリア語ですが、日本語では何と言うでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_85" value="a"> A. イロハニホヘト</label>
+                <label><input type="radio" name="q_85" value="b"> B. ハニホヘトイロ</label>
+                <label><input type="radio" name="q_85" value="c"> C. アイウエオカキ</label>
+                <label><input type="radio" name="q_85" value="d"> D. 一二三四五六七</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. ハニホヘトイロ</strong><br>日本の音名表記です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問86【言葉】ゴルフボールの表面にあるデコボコを何と呼ぶでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_86" value="a"> A. クレーター</label>
+                <label><input type="radio" name="q_86" value="b"> B. ホール</label>
+                <label><input type="radio" name="q_86" value="c"> C. ディンプル</label>
+                <label><input type="radio" name="q_86" value="d"> D. ドット</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. ディンプル</strong><br>空気抵抗を減らし、ボールを遠くまで飛ばす役割があります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問87【言葉】缶詰を発明したきっかけとなった歴史上の人物は誰でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_87" value="a"> A. リンカーン</label>
+                <label><input type="radio" name="q_87" value="b"> B. ナポレオン</label>
+                <label><input type="radio" name="q_87" value="c"> C. ビスマルク</label>
+                <label><input type="radio" name="q_87" value="d"> D. チャーチル</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. ナポレオン</strong><br>軍隊の食料を長期保存する方法を公募したのがきっかけです。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問88【言葉】「的を得る」と「的を射る」、正しいのはどちらでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_88" value="a"> A. 的を得る</label>
+                <label><input type="radio" name="q_88" value="b"> B. 的を射る</label>
+                <label><input type="radio" name="q_88" value="c"> C. どちらも正しい</label>
+                <label><input type="radio" name="q_88" value="d"> D. どちらも間違い</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 的を射る</strong><br>要点を正確に捉える、という意味で使われます。「的を得る」は間違いとされています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問89【言葉】1円玉を1枚作るのに、費用はいくらかかるでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_89" value="a"> A. 1円未満</label>
+                <label><input type="radio" name="q_89" value="b"> B. ちょうど1円</label>
+                <label><input type="radio" name="q_89" value="c"> C. 約3円</label>
+                <label><input type="radio" name="q_89" value="d"> D. 約5円</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 約3円</strong><br>アルミニウムの地金代や製造コストで、額面以上の費用がかかります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問90【言葉】「アキレス腱」の由来となった、ギリシャ神話の英雄アキレウス。彼の唯一の弱点はどこだったでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_90" value="a"> A. 心臓</label>
+                <label><input type="radio" name="q_90" value="b"> B. 目</label>
+                <label><input type="radio" name="q_90" value="c"> C. かかと</label>
+                <label><input type="radio" name="q_90" value="d"> D. 喉</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. かかと</strong><br>母親が不死の体にするため彼を聖なる川に浸した際、掴んでいたかかとだけが水に浸からなかった、という伝説からです。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問91【言葉】温泉マーク（♨）の3本の湯気。真ん中が長いのはなぜでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_91" value="a"> A. バランスを取るため</label>
+                <label><input type="radio" name="q_91" value="b"> B. 後から出た湯気の方が勢いが良いから</label>
+                <label><input type="radio" name="q_91" value="c"> C. 特に意味はない</label>
+                <label><input type="radio" name="q_91" value="d"> D. 温泉の「川」という字を模しているから</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 後から出た湯気の方が勢いが良いから</strong><br>時間差で湯気が立ち上る様子を表しているとされています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問92【言葉】映画館でポップコーンが定番なのはなぜでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_92" value="a"> A. 利益率が高いから</label>
+                <label><input type="radio" name="q_92" value="b"> B. 匂いが少なく、食べる音も小さいから</label>
+                <label><input type="radio" name="q_92" value="c"> C. 作るのが簡単だから</label>
+                <label><input type="radio" name="q_92" value="d"> D. 昔からの伝統だから</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 匂いが少なく、食べる音も小さいから</strong><br>映画鑑賞の邪魔になりにくいという理由で広まりました。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問93【言葉】ボウリングのピンは全部で何本でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_93" value="a"> A. 9本</label>
+                <label><input type="radio" name="q_93" value="b"> B. 10本</label>
+                <label><input type="radio" name="q_93" value="c"> C. 12本</label>
+                <label><input type="radio" name="q_93" value="d"> D. 15本</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 10本</strong><br>正三角形に並べられています。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問94【言葉】「アルカリ」の語源となった植物は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_94" value="a"> A. 灰</label>
+                <label><input type="radio" name="q_94" value="b"> B. 藻</label>
+                <label><input type="radio" name="q_94" value="c"> C. 藍</label>
+                <label><input type="radio" name="q_94" value="d"> D. 葦</label>
+            </div>
+            <div class="feedback" data-correct="a"><strong>【正解】A. 灰</strong><br>アラビア語で「植物の灰」を意味する言葉が語源です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問95【言葉】日本の都道府県で、海に面していない県は全部でいくつあるでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_95" value="a"> A. 6県</label>
+                <label><input type="radio" name="q_95" value="b"> B. 7県</label>
+                <label><input type="radio" name="q_95" value="c"> C. 8県</label>
+                <label><input type="radio" name="q_95" value="d"> D. 9県</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 8県</strong><br>栃木、群馬、埼玉、山梨、長野、岐阜、滋賀、奈良の8県です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問96【言葉】「姑息（こそく）」という言葉の本来の意味は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_96" value="a"> A. ひきょうな</label>
+                <label><input type="radio" name="q_96" value="b"> B. その場しのぎ</label>
+                <label><input type="radio" name="q_96" value="c"> C. ずる賢い</label>
+                <label><input type="radio" name="q_96" value="d"> D. 根性が曲がっている</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. その場しのぎ</strong><br>「ひきょう」という意味で使われることが多いですが、本来は一時的な間に合わせ、という意味です。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問97【言葉】自動販売機で、500円玉が使えるものと使えないものがあるのはなぜでしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_97" value="a"> A. 電気代節約のため</label>
+                <label><input type="radio" name="q_97" value="b"> B. お釣りの計算が複雑になるから</label>
+                <label><input type="radio" name="q_97" value="c"> C. 新旧の500円玉を識別できないから</label>
+                <label><input type="radio" name="q_97" value="d"> D. 故障しているから</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 新旧の500円玉を識別できないから</strong><br>古い自販機は、偽造された旧500円玉と新しい500円玉を区別できないことがあります。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問98【言葉】柔道の黒帯の上には、さらに2つの色の帯があります。それは何色と何色でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_98" value="a"> A. 金帯と銀帯</label>
+                <label><input type="radio" name="q_98" value="b"> B. 紅白帯と赤帯</label>
+                <label><input type="radio" name="q_98" value="c"> C. 紫帯と茶帯</label>
+                <label><input type="radio" name="q_98" value="d"> D. 藍帯と白帯</label>
+            </div>
+            <div class="feedback" data-correct="b"><strong>【正解】B. 紅白帯と赤帯</strong><br>六段から八段が紅白帯、九段と十段が赤帯を締めることができます。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問99【言葉】「さようなら」の語源は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_99" value="a"> A. 「左様ならば」という接続詞</label>
+                <label><input type="radio" name="q_99" value="b"> B. 「然様なら」という肯定の言葉</label>
+                <label><input type="radio" name="q_99" value="c"> C. 「また会いましょう」という意味の古語</label>
+                <label><input type="radio" name="q_99" value="d"> D. 外来語が変化したもの</label>
+            </div>
+            <div class="feedback" data-correct="a"><strong>【正解】A. 「左様ならば」という接続詞</strong><br>「左様ならば、これにて失礼」のように、「それならば」という意味の言葉が省略されたものです。</div>
+        </div>
+        <div class="question-block">
+            <p class="question-title">問100【言葉】世界で一番多くの人が話している言語は何でしょう？</p>
+            <div class="options">
+                <label><input type="radio" name="q_100" value="a"> A. 中国語</label>
+                <label><input type="radio" name="q_100" value="b"> B. スペイン語</label>
+                <label><input type="radio" name="q_100" value="c"> C. 英語</label>
+                <label><input type="radio" name="q_100" value="d"> D. ヒンディー語</label>
+            </div>
+            <div class="feedback" data-correct="c"><strong>【正解】C. 英語</strong><br>第二言語として話す人も含めると最も多くなります。母語話者数では中国語が最多です。</div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ----- グローバル変数と要素の取得 -----
+            const screens = {
+                start: document.getElementById('start-screen'),
+                quiz: document.getElementById('quiz-screen'),
+                results: document.getElementById('results-screen')
+            };
+            const questionContainer = document.getElementById('question-container');
+            const nextBtn = document.getElementById('next-btn');
+            const restartBtn = document.getElementById('restart-btn');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const allQuestionsSource = Array.from(document.querySelectorAll('#all-questions-source .question-block'));
+            
+            let currentQuizQuestions = [];
+            let currentQuestionIndex = 0;
+            let score = 0;
+
+            // ----- 画面切り替え関数 -----
+            function showScreen(screenName) {
+                Object.values(screens).forEach(screen => screen.classList.remove('active'));
+                screens[screenName].classList.add('active');
+            }
+
+            // ----- クイズ開始処理 -----
+            function startQuiz(numQuestions) {
+                score = 0;
+                currentQuestionIndex = 0;
+                
+                const shuffled = allQuestionsSource.sort(() => 0.5 - Math.random());
+                currentQuizQuestions = shuffled.slice(0, numQuestions);
+                
+                showScreen('quiz');
+                displayQuestion();
+            }
+
+            // ----- 問題表示処理 -----
+            function displayQuestion() {
+                questionContainer.innerHTML = '';
+                updateProgress();
+
+                const questionNode = currentQuizQuestions[currentQuestionIndex].cloneNode(true);
+                
+                // 選択肢の順番をシャッフル
+                const optionsContainer = questionNode.querySelector('.options');
+                const options = Array.from(optionsContainer.children);
+                options.sort(() => Math.random() - 0.5);
+                options.forEach(option => optionsContainer.appendChild(option));
+
+                // ラジオボタンのname属性をユニークにし、イベントリスナーを追加
+                const radios = questionNode.querySelectorAll('input[type="radio"]');
+                radios.forEach(radio => {
+                    radio.name = `q_${currentQuestionIndex}`;
+                    radio.addEventListener('change', handleAnswerSelection);
+                });
+
+                // 問題をコンテナに挿入
+                const newQuestionBlock = document.createElement('div');
+                newQuestionBlock.className = 'question-block bg-gray-50 p-5 rounded-lg border border-gray-200';
+                
+                const title = questionNode.querySelector('.question-title');
+                title.className = 'question-title font-bold text-lg mb-4 text-gray-800';
+                title.innerHTML = title.innerHTML.replace(/問\d+【.*?】/, `問${currentQuestionIndex + 1} `);
+
+                const optionsDiv = questionNode.querySelector('.div');
+                optionsContainer.className = 'options space-y-3';
+                optionsContainer.querySelectorAll('label').forEach(label => {
+                   label.className = 'block p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 transition';
+                   label.querySelector('input').className = 'hidden';
+                });
+                
+                newQuestionBlock.appendChild(title);
+                newQuestionBlock.appendChild(optionsContainer);
+                newQuestionBlock.appendChild(questionNode.querySelector('.feedback'));
+                
+                questionContainer.appendChild(newQuestionBlock);
+
+                nextBtn.style.display = 'none';
+                nextBtn.classList.add('hidden');
+            }
+            
+            // ----- 回答選択時の処理 -----
+            function handleAnswerSelection(event) {
+                const selectedLabel = event.target.parentElement;
+                const optionsContainer = selectedLabel.parentElement;
+                const questionBlock = optionsContainer.closest('.question-block');
+                const feedback = questionBlock.querySelector('.feedback');
+                feedback.className = 'feedback p-4 mt-4 border-l-4 rounded-r-lg'; // Reset classes
+                const correctAnswer = feedback.getAttribute('data-correct');
+                
+                optionsContainer.classList.add('answered');
+                optionsContainer.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.disabled = true;
+                });
+
+                if (event.target.value === correctAnswer) {
+                    score++;
+                    selectedLabel.classList.add('correct');
+                    feedback.classList.add('correct');
+                    feedback.querySelector('strong').textContent = `正解！ (${event.target.value.toUpperCase()})`;
+                } else {
+                    selectedLabel.classList.add('incorrect');
+                    feedback.classList.add('incorrect');
+                    const correctLabel = optionsContainer.querySelector(`input[value="${correctAnswer}"]`).parentElement;
+                    correctLabel.classList.add('correct');
+                    feedback.querySelector('strong').textContent = `不正解... (正解: ${correctAnswer.toUpperCase()})`;
+                }
+                
+                nextBtn.style.display = 'block';
+                nextBtn.classList.remove('hidden');
+
+                if (currentQuestionIndex < currentQuizQuestions.length - 1) {
+                    nextBtn.textContent = '次の問題へ';
+                } else {
+                    nextBtn.textContent = '結果を見る';
+                }
+            }
+
+            // ----- 進捗表示の更新 -----
+            function updateProgress() {
+                const total = currentQuizQuestions.length;
+                const current = currentQuestionIndex + 1;
+                progressText.textContent = `問題 ${current} / ${total}`;
+                progressBar.style.width = `${(current / total) * 100}%`;
+            }
+
+            // ----- 結果表示処理 -----
+            function showResults() {
+                showScreen('results');
+                const total = currentQuizQuestions.length;
+                const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+
+                document.getElementById('total-questions-result').textContent = total;
+                document.getElementById('score-result').textContent = score;
+                
+                let message = '';
+                if (percentage === 100) {
+                    message = '素晴らしい！全問正解、あなたは雑学王です！';
+                } else if (percentage >= 80) {
+                    message = 'お見事！かなりの雑学通ですね。';
+                } else if (percentage >= 50) {
+                    message = 'よく頑張りました。もう一息！';
+                } else {
+                    message = 'お疲れ様でした。また挑戦して知識を深めましょう！';
+                }
+                document.getElementById('result-message').textContent = message;
+            }
+
+            // ----- イベントリスナーの設定 -----
+            document.querySelectorAll('.mode-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const num = parseInt(e.target.getAttribute('data-questions'), 10);
+                    startQuiz(num);
+                });
+            });
+
+            nextBtn.addEventListener('click', () => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < currentQuizQuestions.length) {
+                    displayQuestion();
+                } else {
+                    showResults();
+                }
+            });
+
+            restartBtn.addEventListener('click', () => {
+                showScreen('start');
+            });
+        });
+    </script>
+
+</body>
+</html>
