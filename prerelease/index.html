@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>次世代プログラミング教育アプリ『（アプリ名）』</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Swiper.jsのCSSを追加 -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #81c7f5, #a8e063);
+        }
+        .section-title {
+            font-size: 2.25rem; /* 36px */
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #1f2937;
+        }
+        .cta-button {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+        /* Swiper.jsのカスタマイズ */
+        .swiper { /* swiper-containerからswiperに変更 */
+            width: 100%;
+            padding-top: 20px;
+            padding-bottom: 50px; /* ページネーションのために余白を確保 */
+        }
+        .swiper-slide {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .feature-card {
+            width: 90%;
+            max-width: 400px; /* カードの最大幅を設定 */
+            height: auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        .swiper-button-next, .swiper-button-prev {
+            color: #007aff;
+        }
+        .swiper-pagination-bullet-active {
+            background: #007aff;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- ヘッダー -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-gray-800">（アプリ名）</div>
+            <a href="#contact" class="cta-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-full">
+                お問い合わせ
+            </a>
+        </div>
+    </header>
+
+    <!-- ヒーローセクション -->
+    <section class="gradient-bg text-white py-20 md:py-32">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 leading-tight">
+                園児たちの「創造力」と「協調性」を育む
+            </h1>
+            <p class="text-lg md:text-2xl mb-8">
+                先生の業務負担を軽減し、保護者との連携を深める、全く新しいICT教育ソリューション
+            </p>
+            <a href="#contact" class="cta-button bg-white text-blue-600 font-bold py-4 px-10 rounded-full text-lg">
+                資料請求・デモを申し込む
+            </a>
+        </div>
+    </section>
+
+    <!-- お悩みセクション -->
+    <section class="py-16 md:py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title">
+                <span class="text-orange-500">こんなお悩み</span>、ありませんか？
+            </h2>
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="bg-gray-100 p-8 rounded-xl">
+                    <div class="text-5xl mb-4">📂</div>
+                    <h3 class="text-xl font-bold mb-2">作品管理が大変…</h3>
+                    <p class="text-gray-600">園児一人ひとりの作品がどの端末にあるか分からず、管理が煩雑になっている。</p>
+                </div>
+                <div class="bg-gray-100 p-8 rounded-xl">
+                    <div class="text-5xl mb-4">👨‍👩‍👧‍👦</div>
+                    <h3 class="text-xl font-bold mb-2">感動を伝えきれない…</h3>
+                    <p class="text-gray-600">素晴らしい作品ができても、その制作過程や楽しさを保護者にうまく伝えられていない。</p>
+                </div>
+                <div class="bg-gray-100 p-8 rounded-xl">
+                    <div class="text-5xl mb-4">🤝</div>
+                    <h3 class="text-xl font-bold mb-2">協調性も育みたい…</h3>
+                    <p class="text-gray-600">個々の創造力だけでなく、お友達と協力して作る楽しさも体験させてあげたい。</p>
+                </div>
+            </div>
+            <p class="text-center text-2xl font-bold text-gray-800 mt-12">
+                そのお悩み、<span class="text-blue-600">『（アプリ名）』</span>がすべて解決します。
+            </p>
+        </div>
+    </section>
+    
+    <!-- 特徴セクション (スライダーに変更) -->
+    <section class="py-16 md:py-24">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title">『（アプリ名）』が選ばれる<span class="text-blue-600">3つの特徴</span></h2>
+            <!-- Swiper -->
+            <div class="swiper"> <!-- swiper-containerからswiperに変更 -->
+                <div class="swiper-wrapper">
+                    <!-- スライド1 -->
+                    <div class="swiper-slide">
+                        <div class="feature-card bg-white p-8 rounded-2xl shadow-lg">
+                            <div class="text-3xl font-bold text-blue-500 mb-4">01</div>
+                            <h3 class="text-2xl font-bold mb-4 text-gray-800">成長の見える化</h3>
+                            <p class="text-gray-600 mb-4">園児ごとのアカウントで作品をクラウドに自動保存。一人ひとりの成長の軌跡が、園の大切な記録資産になります。</p>
+                            <img src="https://placehold.co/600x400/3498db/ffffff?text=成長記録" alt="成長記録のイメージ" class="rounded-lg w-full h-auto" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';">
+                        </div>
+                    </div>
+                    <!-- スライド2 -->
+                    <div class="swiper-slide">
+                        <div class="feature-card bg-white p-8 rounded-2xl shadow-lg">
+                            <div class="text-3xl font-bold text-green-500 mb-4">02</div>
+                            <h3 class="text-2xl font-bold mb-4 text-gray-800">感動を家庭へ</h3>
+                            <p class="text-gray-600 mb-4">園児が作った「動く作品」をワンタッチで保護者へ共有。園の教育への信頼と満足度を高めます。</p>
+                            <img src="https://placehold.co/600x400/2ecc71/ffffff?text=保護者連携" alt="保護者連携のイメージ" class="rounded-lg w-full h-auto" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';">
+                        </div>
+                    </div>
+                    <!-- スライド3 -->
+                    <div class="swiper-slide">
+                        <div class="feature-card bg-white p-8 rounded-2xl shadow-lg">
+                            <div class="text-3xl font-bold text-orange-500 mb-4">03</div>
+                            <h3 class="text-2xl font-bold mb-4 text-gray-800">みんなで共同制作</h3>
+                            <p class="text-gray-600 mb-4">独自の機能で、複数の園児のキャラクターが一緒に動く作品を制作。協調性と非認知能力を育みます。</p>
+                            <img src="https://placehold.co/600x400/e67e22/ffffff?text=共同制作" alt="共同制作のイメージ" class="rounded-lg w-full h-auto" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/ffffff?text=Image+Not+Found';">
+                        </div>
+                    </div>
+                </div>
+                <!-- ページネーション -->
+                <div class="swiper-pagination"></div>
+                <!-- ナビゲーションボタン -->
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 比較セクション -->
+    <section class="py-16 md:py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title">従来のアプリとの<span class="text-orange-500">決定的な違い</span></h2>
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-max text-left border-collapse rounded-lg shadow-lg">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-4 md:p-6 text-lg font-bold text-gray-700">機能</th>
+                            <th class="p-4 md:p-6 text-lg font-bold text-gray-700">従来のアプリ</th>
+                            <th class="p-4 md:p-6 text-lg font-bold text-blue-600 bg-blue-100">新しいアプリ『（アプリ名）』</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b">
+                            <td class="p-4 md:p-6 font-semibold">作品管理</td>
+                            <td class="p-4 md:p-6 text-gray-600">端末ごとの保存で煩雑</td>
+                            <td class="p-4 md:p-6 font-bold text-blue-700 bg-blue-50">✅ 園児アカウントで自動管理</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-4 md:p-6 font-semibold">成長記録</td>
+                            <td class="p-4 md:p-6 text-gray-600">記録・蓄積が難しい</td>
+                            <td class="p-4 md:p-6 font-bold text-blue-700 bg-blue-50">📊 一人ひとりの成長をデータで可視化</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-4 md:p-6 font-semibold">保護者連携</td>
+                            <td class="p-4 md:p-6 text-gray-600">手間がかかる</td>
+                            <td class="p-4 md:p-6 font-bold text-blue-700 bg-blue-50">📲 「動く作品」をワンタッチ共有</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 md:p-6 font-semibold">共同作業</td>
+                            <td class="p-4 md:p-6 text-gray-600">基本的に個人制作のみ</td>
+                            <td class="p-4 md:p-6 font-bold text-blue-700 bg-blue-50">🎨 複数人で一つの作品を共同制作</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- 最終CTAセクション -->
+    <section id="contact" class="gradient-bg text-white py-20 md:py-24">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">先行導入園様 募集中！</h2>
+            <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">
+                未来を担う子どもたちの「創る力」と「協力する心」を、貴園で一緒に育てていきませんか？<br>
+                先行導入園様には特別価格でのご提供など、特典をご用意しております。
+            </p>
+            <div class="bg-white rounded-xl shadow-2xl p-8 md:p-12 max-w-2xl mx-auto">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">まずはお気軽にお問い合わせください</h3>
+                <form>
+                    <div class="mb-4">
+                        <input type="text" placeholder="貴園名" class="w-full p-3 rounded-md border border-gray-300 text-gray-700">
+                    </div>
+                    <div class="mb-4">
+                        <input type="email" placeholder="メールアドレス" class="w-full p-3 rounded-md border border-gray-300 text-gray-700">
+                    </div>
+                    <div class="mb-6">
+                        <textarea placeholder="お問い合わせ内容" rows="4" class="w-full p-3 rounded-md border border-gray-300 text-gray-700"></textarea>
+                    </div>
+                    <button type="submit" class="cta-button w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-full text-lg">
+                        送信する
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- フッター -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 （会社名）. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Swiper.jsのJavaScriptを追加 -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        // Swiperの初期化
+        var swiper = new Swiper('.swiper', { // swiper-containerからswiperに変更
+            // オプション
+            slidesPerView: 1, // 一度に表示するスライドの数
+            spaceBetween: 30, // スライド間の余白
+            loop: true, // ループ再生
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            // レスポンシブ対応
+            breakpoints: {
+                // 768px以上の場合
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 40
+                },
+                // 1024px以上の場合
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 50
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
