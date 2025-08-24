@@ -205,17 +205,13 @@
         }
 
         /**
-         * Calls the Gemini API to get research theme suggestions.
-         * Implements exponential backoff for retries.
+         * サーバーレス関数を呼び出して研究テーマを取得します。
          * @param {string} grade - The user's grade level.
          * @param {string} animal - The animal of interest.
-         * @param {number} maxRetries - The maximum number of retries.
          * @returns {Promise<Array<Object>>} - A promise that resolves to an array of theme objects.
          */
-        async function callGeminiApi(grade, animal, maxRetries = 3) {
-            const apiKey = ""; // APIキーはCanvas環境で自動的に提供されます
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
+        async function callServerlessApi(grade, animal) {
+            // このサイト専用のプロンプトをここで組み立てます。
             const prompt = `
 あなたは子供向けの自由研究アドバイザーです。以下の条件で、動物園で観察できる面白くて学びのある自由研究の課題を3つ提案してください。
 子供にもわかる簡単な言葉で、何を観察すればよいかのヒントも具体的に添えてください。
@@ -224,59 +220,25 @@
 * 学年: ${grade}
 * 興味のある動物: ${animal}
 `;
+            // Vercelでデプロイされたサーバーレス関数を呼び出します。
+            // パスはサイトのルートからの絶対パス `/api/generate-themes` になります。
+            const response = await fetch('/api/generate-themes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // 組み立てたプロンプトをサーバーに送信します。
+                body: JSON.stringify({ prompt: prompt }),
+            });
 
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "ARRAY",
-                        description: "自由研究のテーマのリスト",
-                        items: {
-                            type: "OBJECT",
-                            properties: {
-                                title: { type: "STRING", description: "研究テーマのタイトル" },
-                                description: { type: "STRING", description: "何を観察すればよいかの具体的なヒント" }
-                            },
-                            required: ["title", "description"]
-                        }
-                    }
-                }
-            };
-
-            let attempt = 0;
-            while (attempt < maxRetries) {
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`APIエラー: ${response.status} ${response.statusText}`);
-                    }
-
-                    const result = await response.json();
-                    
-                    if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0].text) {
-                        const themes = JSON.parse(result.candidates[0].content.parts[0].text);
-                        // Ensure we return exactly 3 themes
-                        return themes.slice(0, 3);
-                    } else {
-                        throw new Error("AIからの応答が予期した形式ではありません。");
-                    }
-                } catch (error) {
-                    console.error(`Attempt ${attempt + 1} failed:`, error);
-                    attempt++;
-                    if (attempt >= maxRetries) {
-                        throw error; // Max retries reached, re-throw the last error
-                    }
-                    const delay = Math.pow(2, attempt) * 1000; // Exponential backoff
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                }
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'サーバーでエラーが発生しました。');
             }
+
+            return response.json();
         }
+
 
         function displayThemes(themes) {
             themesContainer.innerHTML = ''; // Clear previous themes
@@ -343,14 +305,15 @@
             suggestionsContent.classList.add('hidden');
 
             try {
-                const themes = await callGeminiApi(userChoices.grade, userChoices.animal);
+                // 修正点：サーバーレス関数を呼び出すように変更
+                const themes = await callServerlessApi(userChoices.grade, userChoices.animal);
                 displayThemes(themes);
                 loadingDiv.classList.add('hidden');
                 suggestionsContent.classList.remove('hidden');
             } catch (error) {
                 console.error("Failed to get themes from API:", error);
                 showPage('input'); // Go back to input page on failure
-                showApiError('AIとの通信に失敗しました。少し時間をおいてから、もう一度試してください。');
+                showApiError(error.message || 'AIとの通信に失敗しました。少し時間をおいてから、もう一度試してください。');
             } finally {
                 // Re-enable button
                 getThemesBtn.disabled = false;
