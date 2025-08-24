@@ -1,7 +1,22 @@
 // Vercelのサーバーレス関数として動作するNode.jsのコードです。
-// より汎用的に、ブラウザから送信されたプロンプトをAIに渡す役割をします。
+// 別のドメイン（GitHub Pages）からのアクセスを許可するCORS設定を含んでいます。
 
 export default async function handler(req, res) {
+  // ▼▼▼▼▼ CORS設定 ▼▼▼▼▼
+  // 指定したURL（あなたのGitHub Pages）からのアクセスを許可します。
+  res.setHeader('Access-Control-Allow-Origin', 'https://sato-toshiya.github.io');
+  // 許可するHTTPメソッドを指定します。
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  // 許可するHTTPヘッダーを指定します。
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // OPTIONSメソッドは、ブラウザが実際のリクエストを送る前に行う「確認」のためのリクエストです。
+  // この確認リクエストに対しては、何も処理せず「OK」とだけ返します。
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  // ▲▲▲▲▲ CORS設定ここまで ▲▲▲▲▲
+
   // POSTメソッド以外のリクエストは許可しない
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
@@ -27,12 +42,10 @@ export default async function handler(req, res) {
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
     // 3. Gemini APIに送信する設定を作成
-    // プロンプトはブラウザから受け取ったものをそのまま使用します。
     const payload = {
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       generationConfig: {
         responseMimeType: "application/json",
-        // このスキーマも必要に応じてブラウザから渡すようにすると、さらに汎用性が高まります。
         responseSchema: {
           type: "ARRAY",
           description: "自由研究のテーマのリスト",
