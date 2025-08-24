@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,33 +7,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Inter:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-
         .font-jp-title {
             font-family: 'Mochiy Pop One', sans-serif;
         }
-
         .page {
             animation: fadeIn 0.5s ease-in-out;
         }
-
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
         .error-message {
             display: none;
             color: #c53030;
@@ -47,7 +34,6 @@
         }
     </style>
 </head>
-
 <body class="bg-green-50 text-gray-800">
 
     <div id="app" class="container mx-auto p-4 max-w-2xl">
@@ -65,8 +51,7 @@
             <div class="space-y-6">
                 <div>
                     <label for="grade" class="block text-lg font-bold text-gray-700 mb-2">① がくねん を おしえてね</label>
-                    <select id="grade"
-                        class="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-green-500">
+                    <select id="grade" class="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-green-500">
                         <option>小学校 低学年</option>
                         <option selected>小学校 中学年</option>
                         <option>小学校 高学年</option>
@@ -75,12 +60,9 @@
                 </div>
                 <div>
                     <label for="animal" class="block text-lg font-bold text-gray-700 mb-2">② きょうみのある どうぶつ は？</label>
-                    <input type="text" id="animal" value="コアラ"
-                        class="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-green-500"
-                        placeholder="例：ライオン、カブトムシ">
+                    <input type="text" id="animal" value="コアラ" class="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-green-500" placeholder="例：ライオン、カブトムシ">
                 </div>
-                <button id="get-themes-btn"
-                    class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold text-xl py-4 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:bg-gray-300 disabled:cursor-not-allowed">
+                <button id="get-themes-btn" class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold text-xl py-4 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:bg-gray-300 disabled:cursor-not-allowed">
                     AIにテーマを考えてもらう！
                 </button>
                 <div id="api-error" class="error-message"></div>
@@ -94,13 +76,12 @@
                 <p class="mt-4 text-lg font-semibold text-green-700">AIががんばって考えているよ...</p>
             </div>
             <div id="suggestions-content" class="hidden">
-                <h3 class="text-2xl font-bold text-center mb-6 text-green-800">AIから３つのテーマがとどいたよ！</h3>
-                <p class="text-center text-gray-600 mb-6">やってみたい研究を選んでね。</p>
+                 <h3 class="text-2xl font-bold text-center mb-6 text-green-800">AIから３つのテーマがとどいたよ！</h3>
+                 <p class="text-center text-gray-600 mb-6">やってみたい研究を選んでね。</p>
                 <div id="themes-container" class="space-y-4">
                     <!-- AI themes will be inserted here by JavaScript -->
                 </div>
-                <button id="back-to-input-btn"
-                    class="mt-6 w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-lg">もどる</button>
+                 <button id="back-to-input-btn" class="mt-6 w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-lg">もどる</button>
             </div>
         </div>
 
@@ -109,10 +90,9 @@
             <h3 class="text-xl font-bold text-center mb-1 text-green-800">たんけんノート</h3>
             <h4 id="notebook-title" class="text-2xl font-bold text-center mb-6 bg-green-100 p-3 rounded-lg"></h4>
             <div class="space-y-6">
-                <div>
+                 <div>
                     <label class="block text-lg font-bold text-gray-700 mb-2">おなまえ</label>
-                    <input type="text" id="user-name" class="w-full p-3 border border-gray-300 rounded-lg"
-                        placeholder="どうぶつ はかせ">
+                    <input type="text" id="user-name" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="どうぶつ はかせ">
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -121,27 +101,22 @@
                     </div>
                     <div>
                         <label class="block text-lg font-bold text-gray-700 mb-2">天気</label>
-                        <input type="text" id="obs-weather" class="w-full p-3 border border-gray-300 rounded-lg"
-                            placeholder="晴れ">
+                        <input type="text" id="obs-weather" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="晴れ">
                     </div>
                 </div>
                 <div>
                     <label class="block text-lg font-bold text-gray-700 mb-2">なにをしていた？</o>
-                        <textarea id="obs-action" rows="3" class="w-full p-3 border border-gray-300 rounded-lg"
-                            placeholder="ほとんど寝ていた。たまにユーカリの葉を食べていた。"></textarea>
+                    <textarea id="obs-action" rows="3" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="ほとんど寝ていた。たまにユーカリの葉を食べていた。"></textarea>
                 </div>
                 <div>
                     <label class="block text-lg font-bold text-gray-700 mb-2">きづいたこと・ふしぎにおもったこと</label>
-                    <textarea id="obs-discovery" rows="5" class="w-full p-3 border border-gray-300 rounded-lg"
-                        placeholder="ユーカリの葉っぱのにおいをかいでから食べていた。好ききらいがあるのかな？"></textarea>
+                    <textarea id="obs-discovery" rows="5" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="ユーカリの葉っぱのにおいをかいでから食べていた。好ききらいがあるのかな？"></textarea>
                 </div>
                 <div>
                     <label class="block text-lg font-bold text-gray-700 mb-2">写真やスケッチをアップロード</label>
-                    <input type="file" id="obs-file" accept="image/*"
-                        class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200" />
+                    <input type="file" id="obs-file" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200"/>
                 </div>
-                <button id="create-report-btn"
-                    class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold text-xl py-4 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                <button id="create-report-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold text-xl py-4 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
                     レポートを作成する！
                 </button>
             </div>
@@ -154,7 +129,7 @@
                 <h1 id="report-title" class="text-center"></h1>
                 <p class="text-center text-lg"><strong>名前:</strong> <span id="report-name"></span></p>
                 <hr class="my-6">
-
+                
                 <h3>はじめに</h3>
                 <p>わたしは、<span id="report-animal-intro"></span>にきょうみがあったので、このテーマを研究することにしました。</p>
 
@@ -171,23 +146,19 @@
                 <h3>わかったこと・考えたこと</h3>
                 <h4>きづいたこと・ふしぎにおもったこと</h4>
                 <p id="report-discovery"></p>
-
+                
                 <h3>しゃしん・スケッチ</h3>
-                <div id="report-image-container"
-                    class="my-4 p-4 border-2 border-dashed rounded-lg text-center bg-gray-50">
+                <div id="report-image-container" class="my-4 p-4 border-2 border-dashed rounded-lg text-center bg-gray-50">
                     <p class="text-gray-500">ここにアップロードした画像が表示されます</p>
                 </div>
 
                 <h3>まとめ・かんそう</h3>
-                <p>今回のかんさつで、<span id="report-animal-summary"></span>の新しい一面を知ることができました。次は、<span
-                        class="bg-yellow-200">[ここに次の研究テーマを書いてみよう]</span>についても調べてみたいです。</p>
+                <p>今回のかんさつで、<span id="report-animal-summary"></span>の新しい一面を知ることができました。次は、<span class="bg-yellow-200">[ここに次の研究テーマを書いてみよう]</span>についても調べてみたいです。</p>
             </div>
-            <button onclick="alert('PDFがダウンロードされました！ (このサイトでは実際のダウンロードは行われません)')"
-                class="mt-8 w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+            <button onclick="alert('PDFがダウンロードされました！ (このサイトでは実際のダウンロードは行われません)')" class="mt-8 w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
                 PDFでダウンロード
             </button>
-            <button id="back-to-notebook-btn"
-                class="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-lg">たんけんノートにもどる</button>
+             <button id="back-to-notebook-btn" class="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-4 rounded-lg">たんけんノートにもどる</button>
         </div>
     </div>
 
@@ -216,7 +187,7 @@
         };
 
         // --- Functions ---
-
+        
         function showPage(pageName) {
             Object.values(pages).forEach(page => page.classList.add('hidden'));
             if (pages[pageName]) {
@@ -233,14 +204,7 @@
             apiErrorDiv.style.display = 'none';
         }
 
-        /**
-         * サーバーレス関数を呼び出して研究テーマを取得します。
-         * @param {string} grade - The user's grade level.
-         * @param {string} animal - The animal of interest.
-         * @returns {Promise<Array<Object>>} - A promise that resolves to an array of theme objects.
-         */
         async function callServerlessApi(grade, animal) {
-            // このサイト専用のプロンプトをここで組み立てます。
             const prompt = `
 あなたは子供向けの自由研究アドバイザーです。以下の条件で、動物園で観察できる面白くて学びのある自由研究の課題を3つ提案してください。
 子供にもわかる簡単な言葉で、何を観察すればよいかのヒントも具体的に添えてください。
@@ -250,8 +214,7 @@
 * 興味のある動物: ${animal}
 `;
             // Vercelでデプロイされたサーバーレス関数を呼び出します。
-            const response = await fetch('https://website-ddt5zpvug-sato-toshiyas-projects.vercel.app/api/generate-themes', {
-
+            const response = await fetch('/api/generate-themes', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -259,32 +222,26 @@
                 body: JSON.stringify({ prompt: prompt }),
             });
 
-            // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
-            // 【エラー修正】応答がJSONでない場合も考慮した、より安全なエラー処理
             if (!response.ok) {
                 const contentType = response.headers.get("content-type");
                 let errorMessage;
-                // サーバーからのエラー応答がJSON形式の場合
                 if (contentType && contentType.includes("application/json")) {
                     const errorData = await response.json();
                     errorMessage = errorData.error || 'サーバーでエラーが発生しました。';
                 } else {
-                    // サーバーからのエラー応答がHTML形式の場合 (404 Not Foundなど)
                     errorMessage = `APIの読み込みに失敗しました (Error: ${response.status})。Vercelのデプロイ設定やフォルダ構成を確認してください。`;
                 }
                 throw new Error(errorMessage);
             }
-            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
-            // 応答が正常 (200 OK) であれば、JSONとして解析して返す
             return response.json();
         }
 
 
         function displayThemes(themes) {
-            themesContainer.innerHTML = ''; // Clear previous themes
+            themesContainer.innerHTML = '';
             if (!themes || themes.length === 0) {
-                themesContainer.innerHTML = '<p class="text-center text-red-600">テーマの取得に失敗しました。もう一度試してください。</p>';
+                 themesContainer.innerHTML = '<p class="text-center text-red-600">テーマの取得に失敗しました。もう一度試してください。</p>';
                 return;
             }
             themes.forEach(theme => {
@@ -303,7 +260,7 @@
                 themesContainer.appendChild(themeCard);
             });
         }
-
+        
         function populateReport() {
             document.getElementById('report-title').textContent = userChoices.theme;
             document.getElementById('report-name').textContent = document.getElementById('user-name').value || '（なまえ）';
@@ -318,7 +275,7 @@
             const imageContainer = document.getElementById('report-image-container');
             if (fileInput.files && fileInput.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function (e) {
+                reader.onload = function(e) {
                     imageContainer.innerHTML = `<img src="${e.target.result}" alt="アップロードされた画像" class="max-w-full max-h-60 mx-auto rounded-lg shadow-sm">`;
                 }
                 reader.readAsDataURL(fileInput.files[0]);
@@ -336,7 +293,7 @@
                 alert('動物の名前をいれてね！');
                 return;
             }
-
+            
             getThemesBtn.disabled = true;
             getThemesBtn.textContent = '考え中...';
             hideApiError();
@@ -373,5 +330,4 @@
 
     </script>
 </body>
-
 </html>

@@ -1,22 +1,7 @@
 // Vercelのサーバーレス関数として動作するNode.jsのコードです。
-// 別のドメイン（GitHub Pages）からのアクセスを許可するCORS設定を含んでいます。
+// ブラウザから送信されたプロンプトをAIに渡し、結果を返す役割をします。
 
 export default async function handler(req, res) {
-  // ▼▼▼▼▼ CORS設定 ▼▼▼▼▼
-  // 指定したURL（あなたのGitHub Pages）からのアクセスを許可します。
-  res.setHeader('Access-Control-Allow-Origin', 'https://sato-toshiya.github.io');
-  // 許可するHTTPメソッドを指定します。
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  // 許可するHTTPヘッダーを指定します。
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  // OPTIONSメソッドは、ブラウザが実際のリクエストを送る前に行う「確認」のためのリクエストです。
-  // この確認リクエストに対しては、何も処理せず「OK」とだけ返します。
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  // ▲▲▲▲▲ CORS設定ここまで ▲▲▲▲▲
-
   // POSTメソッド以外のリクエストは許可しない
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
