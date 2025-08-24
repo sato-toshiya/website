@@ -221,21 +221,32 @@
 * 興味のある動物: ${animal}
 `;
             // Vercelでデプロイされたサーバーレス関数を呼び出します。
-            // パスはサイトのルートからの絶対パス `/api/generate-themes` になります。
             const response = await fetch('/api/generate-themes', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                // 組み立てたプロンプトをサーバーに送信します。
                 body: JSON.stringify({ prompt: prompt }),
             });
 
+            // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+            // 【エラー修正】応答がJSONでない場合も考慮した、より安全なエラー処理
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'サーバーでエラーが発生しました。');
+                const contentType = response.headers.get("content-type");
+                let errorMessage;
+                // サーバーからのエラー応答がJSON形式の場合
+                if (contentType && contentType.includes("application/json")) {
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || 'サーバーでエラーが発生しました。';
+                } else {
+                    // サーバーからのエラー応答がHTML形式の場合 (404 Not Foundなど)
+                    errorMessage = `APIの読み込みに失敗しました (Error: ${response.status})。Vercelのデプロイ設定やフォルダ構成を確認してください。`;
+                }
+                throw new Error(errorMessage);
             }
+            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
+            // 応答が正常 (200 OK) であれば、JSONとして解析して返す
             return response.json();
         }
 
@@ -296,7 +307,6 @@
                 return;
             }
             
-            // Disable button and show loading state
             getThemesBtn.disabled = true;
             getThemesBtn.textContent = '考え中...';
             hideApiError();
@@ -305,17 +315,15 @@
             suggestionsContent.classList.add('hidden');
 
             try {
-                // 修正点：サーバーレス関数を呼び出すように変更
                 const themes = await callServerlessApi(userChoices.grade, userChoices.animal);
                 displayThemes(themes);
                 loadingDiv.classList.add('hidden');
                 suggestionsContent.classList.remove('hidden');
             } catch (error) {
                 console.error("Failed to get themes from API:", error);
-                showPage('input'); // Go back to input page on failure
+                showPage('input'); 
                 showApiError(error.message || 'AIとの通信に失敗しました。少し時間をおいてから、もう一度試してください。');
             } finally {
-                // Re-enable button
                 getThemesBtn.disabled = false;
                 getThemesBtn.textContent = 'AIにテーマを考えてもらう！';
             }
