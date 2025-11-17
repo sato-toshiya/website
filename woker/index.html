@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ワーカー候補者 比較ダッシュボード</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- グラフに金額ラベルを表示するためのプラグイン -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        .tab-button.active {
+            border-bottom-color: #2563EB;
+            color: #2563EB;
+            font-weight: 600;
+        }
+        /* グラフコンテナのスタイル */
+        .chart-container {
+            position: relative;
+            height: 20rem; /* 320px */
+            width: 100%;
+            max-width: 600px; /* 最大幅 */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 24rem; /* 384px */
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- Chosen Palette: Calm Blue and Gray -->
+    <!-- Application Structure Plan: 
+        設計思想: 意思決定者（社長、専務）向けの「結論ファースト」なダッシュボード。
+        構造:
+        1.  [結論・推奨]: まず推奨候補(A: しっかり屋)と主要な理由・懸念事項を提示。
+        2.  [推奨候補の進め方]: 契約した場合の具体的なフローを次に提示。
+        3.  [比較分析]: 主要な比較軸（評価、価格）をインタラクティブなチャートで視覚化。
+        4.  [各候補者 詳細]: タブ切り替えで、各候補者の詳細な提案内容、実績、懸念事項を深掘り可能にする。
+        ユーザーフロー: ユーザーはまず結論を把握し、次に契約後の流れを理解し、その根拠をチャートで視覚的に比較し、最後に詳細タブで各候補の情報を確認する。
+        この構造は、静的なレポートを上から読むよりも迅速な状況把握と意思決定を支援するために選択された。
+    -->
+    <!-- Visualization & Content Choices:
+        -  [結論・推奨 (テキスト)]: Report Info -> 結論 / Goal -> 最重要情報の即時伝達 / Viz -> HTML+Tailwind / Interaction -> なし / Justification -> 意思決定者が最も知りたい情報を最初に提示。
+        -  [進め方 (テキスト)]: Report Info -> しっかり屋の提案 / Goal -> 契約後の具体的なイメージを提供 / Viz -> HTML+Tailwind リスト / Interaction -> なし / Justification -> 推奨候補選択後のアクションを明確化。
+        -  [総合評価 (レーダーチャート)]: Report Info -> 候補者の多面的な定性評価 / Goal -> 複数の定性軸での強み・弱みを視覚的に比較 / Viz -> Radar Chart / Interaction -> ツールチップ、凡例クリックでの非表示 / Justification -> 各候補者の特性（トレードオフ）が一目でわかる。 / Library -> Chart.js (Canvas)
+        -  [見積もり金額 (横棒グラフ)]: Report Info -> 3社の見積もり（定量的）/ Goal -> コストの比較 / Viz -> Horizontal Bar Chart + DataLabels / Interaction -> ツールチップ、ラベル表示 / Justification -> 唯一の純粋な量的データを金額ラベル付きで明確に比較。 / Library -> Chart.js (Canvas) + chartjs-plugin-datalabels
+        -  [各候補者 詳細 (タブ)]: Report Info -> 候補者ごとの詳細テキストと実績URL / Goal -> 選択的な情報開示と証拠の提示 / Viz -> HTML+Tailwind タブUI / Interaction -> タブクリックでコンテンツ切り替え、外部リンク / Justification -> 画面を占有せず、ユーザーが必要な情報だけを深掘りできる。 / Library -> Vanilla JS
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">アプリ開発ワーカー候補者</h1>
+            <h2 class="text-xl md:text-2xl text-blue-600 font-semibold">比較検討ダッシュボード</h2>
+        </header>
+
+        <main class="space-y-12">
+
+            <section id="recommendation" class="bg-white p-6 md:p-8 rounded-lg shadow-lg border border-blue-200">
+                <h3 class="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    結論・推奨
+                </h3>
+                <div class="flex flex-col md:flex-row md:items-center">
+                    <div class="md:w-1/3 text-center md:text-left mb-4 md:mb-0">
+                        <span class="text-base text-gray-500">推奨候補</span>
+                        <h4 class="text-3xl font-bold text-gray-900">A: しっかり屋 さん</h4>
+                    </div>
+                    <div class="md:w-2/3 md:pl-6 md:border-l border-gray-200">
+                        <p class="mb-3 text-gray-700">総合的な判断の結果、<b>A: しっかり屋</b> を第一候補として推奨します。</p>
+                        <div class="space-y-3">
+                            <div>
+                                <h5 class="font-semibold text-green-700">推奨理由:</h5>
+                                <ul class="list-disc list-inside text-sm text-gray-700 space-y-1 mt-1">
+                                    <li><strong>圧倒的な実績の親和性:</strong> 「園向け作品管理システム(300園導入)」など、本プロジェクトとほぼ同じドメインの開発経験を有している。</li>
+                                    <li><strong>提案の解像度:</strong> RFPと設計書を完璧に理解した上で、具体的な開発ステップを提示しており、要求仕様の実現可能性が最も高い。</li>
+                                    <li><strong>PROCW認定:</strong> クラウドワークスによるプロフェッショナル認定を受けており、信頼性が高い。</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold text-red-700">懸念事項:</h5>
+                                <ul class="list-disc list-inside text-sm text-gray-700 space-y-1 mt-1">
+                                    <li>オンライン面談を辞退しており、人柄や体制を直接確認できていない。（外国籍ワーカーの可能性も否めず、コミュニケーションリスクが不明）</li>
+                                    <li>見積もりが3候補の中で最高額である。（¥3,300,000）</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="comparison" class="space-y-8">
+                <h3 class="text-2xl font-bold text-gray-900 text-center">候補者 比較分析</h3>
+                <p class="text-center text-gray-600 max-w-3xl mx-auto">
+                    各候補者の強みと弱みを視覚化しました。レーダーチャートは各候補の特性を示し、棒グラフはコストを明確に比較します。
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h4 class="text-lg font-semibold text-center mb-4">総合評価 (レーダーチャート)</h4>
+                        <div class="chart-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-4 text-center">
+                            4つの軸で各候補を評価。「しっかり屋」は実績と提案解像度が突出しています。
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h4 class="text-lg font-semibold text-center mb-4">見積もり金額 (棒グラフ)</h4>
+                        <div class="chart-container">
+                            <canvas id="priceChart"></canvas>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-4 text-center">
+                            税込の見積もり金額の比較。「prediac」が最安値です。
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="details" class="mt-8">
+                <h3 class="text-2xl font-bold text-gray-900 text-center mb-6">各候補者 詳細</h3>
+                <p class="text-center text-gray-600 max-w-3xl mx-auto mb-6">
+                    タブをクリックして、各候補者の詳細な提案内容、実績、および担当者所感を確認してください。
+                </p>
+
+                <div class="flex justify-center border-b border-gray-300 mb-6 space-x-0 md:space-x-4">
+                    <button id="tab-A" class="tab-button active flex-1 md:flex-none text-center px-4 md:px-6 py-3 text-base font-medium text-gray-500 border-b-2 border-transparent hover:text-blue-600 transition-colors duration-200">
+                        A: しっかり屋
+                    </button>
+                    <button id="tab-B" class="tab-button flex-1 md:flex-none text-center px-4 md:px-6 py-3 text-base font-medium text-gray-500 border-b-2 border-transparent hover:text-blue-600 transition-colors duration-200">
+                        B: 木の葉7777
+                    </button>
+                    <button id="tab-C" class="tab-button flex-1 md:flex-none text-center px-4 md:px-6 py-3 text-base font-medium text-gray-500 border-b-2 border-transparent hover:text-blue-600 transition-colors duration-200">
+                        C: prediac
+                    </button>
+                </div>
+
+                <div class="bg-white p-6 md:p-8 rounded-lg shadow-md">
+                    <div id="content-A" class="tab-content space-y-4">
+                        <h4 class="text-2xl font-bold text-gray-900">A: しっかり屋 さん</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center md:text-left">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <span class="text-sm text-blue-700">見積もり (税込)</span>
+                                <p class="text-xl font-bold">3,300,000円</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <span class="text-sm text-green-700">類似実績</span>
+                                <p class="text-xl font-bold">◎ (非常に高い)</p>
+                            </div>
+                            <div class="bg-yellow-100 p-4 rounded-lg">
+                                <span class="text-sm text-yellow-800">認定</span>
+                                <p class="text-xl font-bold">PROCW認定</p>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-4 space-y-3">
+                            <h5 class="text-lg font-semibold">提案・実績:</h5>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li>RFPと概念設計書を最も深く読み込んだ、詳細かつ具体的な提案。</li>
+                                <li>本案件のドメインと<b>親和性の高い実績</b>をURL付きで提示:
+                                    <ul class="list-disc list-inside ml-6 mt-1 text-sm">
+                                        <li><a href="https://apps.apple.com/jp/app/キッズ-幼児向けパズルと点つなぎ知育アプリ-動物塗り絵ゲーム/id1104890554" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">幼児向け学習アプリ (80万DL)</a></li>
+                                        <li><a href="https://apps.apple.com/jp/app/museum-ミュージアム-子どものお絵かきを簡単整理-保存/id6463109196" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">園向け作品管理システム (300園導入)</a></li>
+                                        <li><a href="https://apps.apple.com/jp/app/成長-growth/id446639811" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">保護者向け成長記録プラットフォーム</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <h5 class="text-lg font-semibold">コミュニケーション:</h5>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li>レスポンスは迅速・丁寧。</li>
+                                <li>ただし、スケジュールの都合を理由に<b>オンライン面談を辞退</b>。「ミーティング不要で着手可能」との意向を示しており、キックオフもチャットベースを希望している。</li>
+                            </ul>
+                            
+                            <h5 class="text-lg font-semibold">担当者所感 (推奨):</h5>
+                            <p class="text-gray-700">
+                                <b>現在の第一候補</b>として推奨。面談辞退は懸念材料だが、提示された実績が本案件の要求と酷似しており、提案内容の解像度も極めて高い。要求仕様を深く理解しており、<b>プロジェクトを完遂に導く能力が最も高い</b>と判断する。
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div id="content-B" class="tab-content hidden space-y-4">
+                        <h4 class="text-2xl font-bold text-gray-900">B: 木の葉7777 さん</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center md:text-left">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <span class="text-sm text-blue-700">見積もり (税込)</span>
+                                <p class="text-xl font-bold">2,750,000円</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <span class="text-sm text-green-700">類似実績</span>
+                                <p class="text-xl font-bold">○ (高い)</p>
+                            </div>
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <span class="text-sm text-gray-700">面談・体制</span>
+                                <p class="text-xl font-bold text-red-600">懸念あり</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 space-y-3">
+                            <h5 class="text-lg font-semibold">提案・実績:</h5>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li>技術スタックとして「Flutter」を提案。効率的な開発が期待できる。</li>
+                                <li>実績として「子ども向けロボット操作アプリ」「小学校ICT教材アプリ」を挙げており、関連性は高い。</li>
+                                <li>ただし、<b>守秘義務を理由にURLは非公開</b>であり、実績の客観的評価が困難。</li>
+                            </ul>
+
+                            <h5 class="text-lg font-semibold">コミュニケーション・体制:</h5>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li>オンライン面談実施済み（11/10）。</li>
+                                <li>外国籍ワーカーであり、<b>コミュニケーションは円滑とは言えなかった</b>。</li>
+                                <li>過去の類似実績がチーム開発（エンジニア3名）であり、本案件を<b>単独で完遂できるかに懸念</b>がある。</li>
+                            </ul>
+                            
+                            <h5 class="text-lg font-semibold">担当者所感:</h5>
+                            <p class="text-gray-700">
+                                面談済みだが、コミュニケーションと単独での完遂能力に不安が残る。実績の客観的証拠（URL）がない点も「しっかり屋」さんに劣る。
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div id="content-C" class="tab-content hidden space-y-4">
+                        <h4 class="text-2xl font-bold text-gray-900">C: prediac さん</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center md:text-left">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <span class="text-sm text-blue-700">見積もり (税込)</span>
+                                <p class="text-xl font-bold">2,351,322円</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <span class="text-sm text-green-700">類似実績</span>
+                                <p class="text-xl font-bold">△ (低い)</p>
+                            </div>
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <span class="text-sm text-gray-700">面談</span>
+                                <p class="text-xl font-bold text-red-600">懸念あり</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 space-y-3">
+                            <h5 class="text-lg font-semibold">提案・実績:</h5>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li>3候補の中で<b>最安値</b>。</li>
+                                <li>提案内容は技術的に詳細で堅実。</li>
+                                <li>提示された実績は高品質だが、本案件の「幼児向け」「教育」ドメインとの<b>関連性が低い</b>:
+                                    <ul class="list-disc list-inside ml-6 mt-1 text-sm">
+                                        <li><a href="https://apps.apple.com/jp/app/wowp-%E5%91%A8%E8%BE%BA%E8%A6%B3%E5%85%89%E3%82%B9%E3%83%9D%E3%83%83%E3%83%88%E6%A4%9C%E7%B4%A2-%E3%81%8A%E3%81%A7%E3%81%8B%E3%81%91-%E6%97%85%E8%A1%8C-%E3%83%87%E3%83%BC%E3%83%88/id6477391690" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">wowp (AI×GPSおでかけナビ)</a></li>
+                                        <li><a href="https://apps.apple.com/jp/app/beat-changer-with-music-app/id6596768526" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Beat Changer (音楽リミックス)</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <h5 class="text-lg font-semibold">コミュニケーション:</h5>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li>オンライン面談実施済み（11/7）。</li>
+                                <li>外国籍ワーカーであり、<b>コミュニケーションが円滑とは言えない</b>可能性あり。</li>
+                            </ul>
+                            
+                            <h5 class="text-lg font-semibold">担当者所感:</h5>
+                            <p class="text-gray-700">
+                                価格は最も魅力的だが、類似ドメインの経験不足が懸念される。幼児向けUI/UXの知見や、教育現場の特殊な要求への対応力は未知数。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="next-steps" class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    推奨候補（しっかり屋）選択時の進め方
+                </h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    第一候補の「しっかり屋」さんを選択した場合、先方からは以下の進行フローが提示されています。
+                </p>
+                <ul class="list-decimal list-inside text-gray-700 space-y-3">
+                    <li><strong>キックオフ:</strong> 先方は要件を十分把握済みとしており、ミーティングは必須ではないとの見解。SlackまたはChatworkでのチャットベース進行を希望。</li>
+                    <li><strong>仕様の最終すり合わせ:</strong> RFP・概念設計書を基に機能単位で最終仕様を確定。不明点は先方でリスト化し、ワイヤーや素材の洗い出しを実施。</li>
+                    <li><strong>開発工程:</strong> マイルストーン方式を提案。(作業工程ごとに予算を分割して支払うことができる機能)
+                        <ol class="list-disc list-inside ml-6 text-sm mt-2 space-y-1">
+                            <li>技術要件定義書の作成</li>
+                            <li>詳細設計／UIワイヤー確定</li>
+                            <li>アプリ開発（iOS/Android）</li>
+                            <li>サーバー・管理画面開発</li>
+                            <li>保護者向けサイト開発</li>
+                            <li>授業支援機能の実装</li>
+                            <li>総合テスト・バグ修正</li>
+                            <li>ストア申請・リリース準備</li>
+                        </ol>
+                    </li>
+                    <li><strong>コミュニケーション:</strong> Chatwork または Slack を希望。</li>
+                </ul>
+            </section>
+
+        </main>
+
+        <footer class="text-center text-sm text-gray-500 mt-16">
+            <p>内部検討資料 | 2025年11月17日 (レポート日付に基づく)</p>
+        </footer>
+
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            
+            Chart.register(ChartDataLabels);
+
+            const createRadarChart = () => {
+                const ctx = document.getElementById('radarChart').getContext('2d');
+                const data = {
+                    labels: ['提案解像度', '類似実績', '面談/ｺﾐｭﾆｹｰｼｮﾝ','価格(安さ)'],
+                    datasets: [
+                        {
+                            label: 'A: しっかり屋',
+                            data: [5, 5, 2, 3],
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'B: 木の葉7777',
+                            data: [3, 4, 3, 4],
+                            backgroundColor: 'rgba(22, 163, 74, 0.2)',
+                            borderColor: 'rgba(22, 163, 74, 1)',
+                            pointBackgroundColor: 'rgba(22, 163, 74, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'C: prediac',
+                            data: [4, 3, 3, 5],
+                            backgroundColor: 'rgba(234, 179, 8, 0.2)',
+                            borderColor: 'rgba(234, 179, 8, 1)',
+                            pointBackgroundColor: 'rgba(234, 179, 8, 1)',
+                            borderWidth: 2
+                        }
+                    ]
+                };
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                max: 5,
+                                min: 0,
+                                ticks: {
+                                    stepSize: 1,
+                                    backdropColor: 'transparent',
+                                    color: '#4B5563'
+                                },
+                                pointLabels: {
+                                    color: '#1F2937',
+                                    font: {
+                                        size: 12
+                                    }
+                                },
+                                grid: {
+                                    color: '#E5E7EB'
+                                },
+                                angleLines: {
+                                    color: '#E5E7EB'
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.r !== null) {
+                                            label += context.parsed.r + ' / 5';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            },
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#374151'
+                                }
+                            },
+                            datalabels: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            };
+
+            const createPriceChart = () => {
+                const ctx = document.getElementById('priceChart').getContext('2d');
+                const data = {
+                    labels: ['C: prediac', 'B: 木の葉7777', 'A: しっかり屋'],
+                    datasets: [{
+                        label: '見積もり金額 (税込)',
+                        data: [2351322, 2750000, 3300000],
+                        backgroundColor: [
+                            'rgba(234, 179, 8, 0.7)',
+                            'rgba(22, 163, 74, 0.7)',
+                            'rgba(59, 130, 246, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(234, 179, 8, 1)',
+                            'rgba(22, 163, 74, 1)',
+                            'rgba(59, 130, 246, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                };
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '金額 (円)',
+                                    color: '#4B5563'
+                                },
+                                ticks: {
+                                    color: '#4B5563',
+                                    callback: function(value, index, values) {
+                                        return (value / 1000000).toLocaleString('ja-JP') + 'M';
+                                    }
+                                },
+                                grid: {
+                                    color: '#E5E7EB',
+                                    borderColor: '#D1D5DB'
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    color: '#1F2937',
+                                    font: {
+                                        weight: '600'
+                                    }
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.x !== null) {
+                                            label += context.parsed.x.toLocaleString('ja-JP') + '円';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                align: 'start',
+                                anchor: 'end',
+                                color: '#FFFFFF',
+                                font: {
+                                    weight: 'bold'
+                                },
+                                formatter: (value, context) => {
+                                    return value.toLocaleString('ja-JP') + '円';
+                                }
+                            }
+                        }
+                    }
+                });
+            };
+
+            const setupTabs = () => {
+                const tabs = document.querySelectorAll('.tab-button');
+                const contents = document.querySelectorAll('.tab-content');
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const targetId = 'content-' + tab.id.split('-')[1];
+
+                        tabs.forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+
+                        contents.forEach(c => {
+                            if (c.id === targetId) {
+                                c.classList.remove('hidden');
+                            } else {
+                                c.classList.add('hidden');
+                            }
+                        });
+                    });
+                });
+            };
+
+            createRadarChart();
+            createPriceChart();
+            setupTabs();
+        });
+    </script>
+</body>
+</html>
