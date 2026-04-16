@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>フィッシングメール再現 (フィッシング詐欺注意)</title>
+    <style>
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        .email-container {
+            background-color: #ffffff;
+            max-width: 700px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+        .header-item {
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+        .header-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 80px;
+        }
+        .subject {
+            font-size: 18px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 15px;
+        }
+        .body-content {
+            padding: 30px;
+        }
+        .warning-banner {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 1px solid #ffcdd2;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="warning-banner">
+            ⚠️ これはフィッシングメールの再現画面です。リンク先は詐欺サイトですので絶対にクリックしないでください。
+        </div>
+        <div class="header">
+            <div class="subject">3 件の保留中のメール: 配信不能 (注文書、保留中の請求書、支払い確認) がレビューのためにリリースされました</div>
+            <div class="header-item"><span class="header-label">差出人:</span> Stemclub メールボックス セキュリティ センター &lt;info@stemclub.jp&gt;</div>
+            <div class="header-item"><span class="header-label">宛先:</span> info@stemclub.jp</div>
+            <div class="header-item"><span class="header-label">日時:</span> 2025年11月7日 8:07</div>
+        </div>
+        <div class="body-content">
+            <div role="document">  <div class="_rp_T4 _rp_U4 ms-font-weight-regular ms-font-color-neutralDark" style="display: none;"></div>  <div autoid="_rp_w" class="_rp_T4" style="display: none;"></div>  <div autoid="_rp_x" class="_rp_T4" id="Item.MessagePartBody"> <div class="_rp_U4 ms-font-weight-regular ms-font-color-neutralDark rpHighlightAllClass rpHighlightBodyClass" id="Item.MessageUniqueBody" style="font-family: &quot;wf_segoe-ui_normal&quot;, &quot;Segoe UI&quot;, &quot;Segoe WP&quot;, Tahoma, Arial, sans-serif, serif, &quot;EmojiFont&quot;;"><div class="rps_e8b9">
+<div>
+<div>
+  <p><strong style="color:rgb(33,33,33); font-family:wf_segoe-ui_normal,&quot;Segoe UI&quot;,&quot;Segoe WP&quot;,Tahoma,Arial,sans-serif,serif,EmojiFont; font-size:15px"><span style="font-family:Arial,serif,EmojiFont; color:#000066; font-size:medium">Stemclub メールボックスセキュリティ</span></strong></p>
+  <p><br>
+    <strong style="color:rgb(33,33,33); font-family:wf_segoe-ui_normal,&quot;Segoe UI&quot;,&quot;Segoe WP&quot;,Tahoma,Arial,sans-serif,serif,EmojiFont; font-size:15px"><span style="font-family:Arial,serif,EmojiFont; color:#000066; font-size:medium">あなたのメールボックスはほぼ満杯です。</span></strong>
+  </p>
+  <table cellspacing="0;">
+    <tbody>
+<tr>
+<td style="background-color:#ffcc00; border-style:solid; border-color:black"><span style="font-family:Tahoma,serif,EmojiFont; font-size:small"><span style="font-size:small">5110 MB</span></span></td>
+<td><span style="background-color:#ffffff; font-family:Tahoma,serif,EmojiFont; color:#000000; font-size:small"><span style="color:#000000; font-size:small"><strong>5120 MB</strong></span></span></td>
+</tr>
+<tr>
+<td><span style="background-color:#ffffff; font-family:Tahoma,serif,EmojiFont; font-size:small">現行のサイズ</span></td>
+<td><span style="background-color:#ffffff; font-family:Tahoma,serif,EmojiFont; font-size:small">最大サイズ</span></td>
+</tr>
+</tbody>
+</table>
+<p><span style="background-color:#ffffff; font-family:Tahoma,serif,EmojiFont; color:#000000; font-size:small">保留中のメールボックスのサイズを小さくしてください, 未配信メール ワンクリックでメールボックスから不要なアイテムを削除。</span></p>
+<p>このプロセスでは、不要なメールを正常に削除するためにアカウントの資格情報を確認する必要があります。</p>
+<p><a href="https://cutt.ly/btqdispS#info@stemclub.jp" target="_blank" rel="noopener noreferrer" style="font-size:13px; font-family:'Google Sans',Roboto,RobotoDraft,Helvetica,Arial,sans-serif; min-width:85px; color:#ffffff; display:inline-block; line-height:14px; background-color:#4175f3; border-radius:6px; padding:13px 26px">クリアな収納スペース</a></p>
+</div>
+
+</div>
+</div></div> <div style="display: none;" class="_rp_c5"></div> </div>  <span class="PersonaPaneLauncher"><div ariatabindex="-1" class="_pe_d _pe_62" aria-expanded="false" tabindex="-1" aria-haspopup="false">  <div style="display: none;"></div> </div></span> </div>
+        </div>
+    </div>
+</body>
+</html>
